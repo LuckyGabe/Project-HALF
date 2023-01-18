@@ -25,6 +25,11 @@ void UBTService_SetPlayerLocation::TickNode(UBehaviorTreeComponent& OwnerComp, u
 	{
 
 		OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), PlayerPawn);
-		OwnerComp.GetBlackboardComponent()->SetValueAsVector("PlayerPosition", PlayerPawn->GetActorLocation());
+	}
+	else 
+	{
+
+		OwnerComp.GetBlackboardComponent()->ClearValue(GetSelectedBlackboardKey());
+
 	}
 }
