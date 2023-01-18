@@ -1,0 +1,25 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "MyAIController.h"
+#include "Kismet/GameplayStatics.h"
+#include "BehaviorTree/BlackboardComponent.h"
+// Called when the game starts or when spawned
+void AMyAIController::BeginPlay()
+{
+    Super::BeginPlay();
+    if (AIBehaviorTree != nullptr)
+    {
+        RunBehaviorTree(AIBehaviorTree);
+
+        
+    }
+    }
+
+// Called every frame
+void AMyAIController::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+   
+}
