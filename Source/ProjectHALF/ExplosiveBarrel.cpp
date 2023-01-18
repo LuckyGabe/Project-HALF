@@ -62,11 +62,11 @@ void AExplosiveBarrel::Explode()
 	{
 		for (int i = 0; i < HitResultArray.Num(); i++)
 		{
-		
+			FPointDamageEvent DamageEvent(Damage, HitResultArray[i], GetActorLocation(), nullptr);
 			AActor* ActorInRange = HitResultArray[i].GetActor();
 			if (ActorInRange != nullptr) 
 			{
-				ActorInRange->TakeDamage(Damage, FDamageEvent(), NULL, this);
+				ActorInRange->TakeDamage(Damage, DamageEvent, NULL, this);
 			}
 			
 		}
