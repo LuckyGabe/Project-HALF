@@ -27,6 +27,7 @@ void AEnemyCharacter::BeginPlay()
 		GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
 		gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("GunSocket"));
 		gun->SetOwner(this);
+		
 	}
 	else { UE_LOG(LogTemp, Error, TEXT("Failed to get gun for the enemy")); }
 }
@@ -38,16 +39,8 @@ void AEnemyCharacter::Tick(float DeltaTime)
 
 }
 
-void AEnemyCharacter::MoveForward(float scale)
-{
-	AddMovementInput(GetActorForwardVector(), scale); // Move the character forward if the scale is 1 and backwards if the scale is -1
-}
 
-void AEnemyCharacter::MoveRight(float scale)
-{
-	AddMovementInput(GetActorRightVector(), scale); //Move actor right if the scale is 1 and left if it is -1
 
-}
 
 
 // Called to bind functionality to input

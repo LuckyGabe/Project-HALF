@@ -27,8 +27,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	void MoveForward(float scale); //Move forward/backward
-	void MoveRight(float scale); // Move left/right
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

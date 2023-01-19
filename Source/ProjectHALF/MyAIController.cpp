@@ -10,8 +10,8 @@ void AMyAIController::BeginPlay()
     Super::BeginPlay();
     if (AIBehaviorTree != nullptr)
     {
-       /* RunBehaviorTree(AIBehaviorTree);
-        GetBlackboardComponent()->SetValueAsVector(TEXT("StartLocation"), GetPawn()->GetActorLocation());*/
+       RunBehaviorTree(AIBehaviorTree);
+        GetBlackboardComponent()->SetValueAsVector(TEXT("StartLocation"), GetPawn()->GetActorLocation());
         
     }
 }
@@ -20,7 +20,5 @@ void AMyAIController::BeginPlay()
 void AMyAIController::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-    APawn* Player = UGameplayStatics::GetPlayerPawn(GetWorld(),0);
-    MoveToActor(Player, 400.0f);
-   
+
 }
