@@ -5,6 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "TimerManager.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "DrawDebugHelpers.h"
 // Sets default values for this component's properties
 UDoorMover::UDoorMover()
 {
@@ -57,7 +58,7 @@ void UDoorMover::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	if (bShouldMove)
 	{
 		GetOwner()->SetActorLocation(NewLocation);
-	
+		UE_LOG(LogTemp, Warning, TEXT("PlayerDetected"));
 	}
 
 	else
@@ -81,8 +82,8 @@ AActor* UDoorMover::GetAllowedActor() const
 	TArray<AActor*> IgnoreActors;
 	UClass* seekClass = NULL;
 
-		UKismetSystemLibrary::BoxOverlapActors(GetWorld(), GetOwner()->GetActorLocation() - FVector(0, 200.0f, 300.0f), FVector(400.0f, 600.0f, 100.0f), TraceObjectTypes, NULL, IgnoreActors, OverlappingActors);
-
+		UKismetSystemLibrary::BoxOverlapActors(GetWorld(), GetOwner()->GetActorLocation() - FVector(0, 200.0f, 200.0f), BoxCheckSize, TraceObjectTypes, NULL, IgnoreActors, OverlappingActors);
+		DrawDebugBox(GetWorld(), GetOwner()->GetActorLocation() - FVector(0, 200.0f, 200.0f), BoxCheckSize, FColor::Red, false, 1);
 		for (AActor* actor : OverlappingActors)
 		{
 			if (actor->ActorHasTag("Player") || actor->ActorHasTag("Enemy"))
