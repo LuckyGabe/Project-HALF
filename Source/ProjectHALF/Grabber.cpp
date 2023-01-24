@@ -48,7 +48,7 @@ void UGrabber::Grab()
 
 		hitResult.GetComponent()->WakeAllRigidBodies();
 		FString hitActorName = hitResult.GetActor()->GetName();
-		UE_LOG(LogTemp, Display, TEXT("Hit target: %s"), *hitActorName);
+		
 
 		//grab
 		physicsHandle->GrabComponentAtLocationWithRotation(hitResult.GetComponent(), NAME_None, hitResult.ImpactPoint, GetComponentRotation());
@@ -63,8 +63,9 @@ bool UGrabber::GetGrabbableInReach(FHitResult& outHitResult) const
 	FVector startVector = GetComponentLocation();
 	FVector endVector = startVector + GetForwardVector() * grabDistance;
 	FCollisionShape sphere = FCollisionShape::MakeSphere(grabRadius);
-	DrawDebugLine(GetWorld(), startVector, endVector, FColor::Red, false, 10.f);
-	DrawDebugSphere(GetWorld(), outHitResult.ImpactPoint, 10, 10, FColor::Blue, false, 3);
+
+	//DrawDebugLine(GetWorld(), startVector, endVector, FColor::Red, false, 10.f);
+	
 
 	return GetWorld()->SweepSingleByChannel(outHitResult, startVector, endVector, FQuat::Identity, ECC_GameTraceChannel2, sphere);;
 }
