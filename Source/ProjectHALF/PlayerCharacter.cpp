@@ -10,8 +10,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Gun.h"
 #include "DrawDebugHelpers.h"
-#include "ReadableNote.h"
-#include "Keypad.h"
+
+
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
@@ -123,8 +123,7 @@ bool APlayerCharacter::RayTrace(FHitResult& OutHit, FVector& ShotDirection)
 	params.AddIgnoredActor(this); // ignore the player's collider
 	params.AddIgnoredActor(GetOwner()); // ignore the player's collider
 	ShotDirection = -rotation.Vector(); // shot the ray where the player's looking
-
-	//DrawDebugPoint(GetWorld(), endPoint, 40.f, FColor::Red, true, 50.f);
+	DrawDebugPoint(GetWorld(), endPoint, 40.f, FColor::Red, true, 50.f);
 	
 	//return the ray trace results
 	return  GetWorld()->LineTraceSingleByChannel(OutHit, location, endPoint, ECollisionChannel::ECC_GameTraceChannel1, params);
@@ -135,7 +134,7 @@ void APlayerCharacter::Interact()
 	//store trace results
 	FVector shotDirection;
 	FHitResult hitResult;
-
+	UE_LOG(LogTemp, Warning, TEXT("Interact"));
 	bool bSuccess = RayTrace(hitResult, shotDirection);
 
 	if (bSuccess)
@@ -176,29 +175,6 @@ void APlayerCharacter::Interact()
 			else { UE_LOG(LogTemp, Warning, TEXT("Failed to cast ammo in Interact() function")); }
 
 		}
-		else if (hitActor != nullptr && hitActor->GetRootComponent()->ComponentHasTag(FName("Note"))) // if the object is an ammunition
-		{
-			
-			AReadableNote* note = Cast<AReadableNote>(hitActor);
-			if (note && !note->IsOpened())
-			{
-				note->OpenNote();
-				note->PlayerPos = GetActorLocation();
-				note->player = Cast<APawn>(this);
-			}
-		}
-		else if (hitActor != nullptr && hitActor->GetRootComponent()->ComponentHasTag(FName("Keypad"))) // if the object is an ammunition
-		{
-
-			AKeypad* keypad = Cast<AKeypad>(hitActor);
-			if (keypad && !keypad->IsOpened())
-			{
-				keypad->OpenKeypad();
-				keypad->PlayerPos = GetActorLocation();
-				keypad->player = Cast<APawn>(this);
-			}
-		}
-
 
 	}
 

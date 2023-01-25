@@ -32,7 +32,7 @@ void UDoorMover::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-
+	//for checking if the player or an enemy is near
 // For moving the door
 	FVector CurrentPosition = GetOwner()->GetActorLocation();
 	FVector TargetPosition = OriginalLocation + MoveOffSet;
@@ -58,7 +58,7 @@ void UDoorMover::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	if (bShouldMove)
 	{
 		GetOwner()->SetActorLocation(NewLocation);
-		
+		UE_LOG(LogTemp, Warning, TEXT("PlayerDetected"));
 	}
 
 	else
@@ -81,13 +81,9 @@ AActor* UDoorMover::GetAllowedActor() const
 	// Ignore any specific actors
 	TArray<AActor*> IgnoreActors;
 	UClass* seekClass = NULL;
-	FVector ActorCenter;
-	FVector ActorSize;
-	GetOwner()->GetActorBounds(true, ActorCenter, ActorSize);
 
-
-		UKismetSystemLibrary::BoxOverlapActors(GetWorld(), ActorCenter, BoxCheckSize, TraceObjectTypes, NULL, IgnoreActors, OverlappingActors);
-		
+		UKismetSystemLibrary::BoxOverlapActors(GetWorld(), GetOwner()->GetActorLocation() - FVector(0, 200.0f, 200.0f), BoxCheckSize, TraceObjectTypes, NULL, IgnoreActors, OverlappingActors);
+		DrawDebugBox(GetWorld(), GetOwner()->GetActorLocation() - FVector(0, 200.0f, 200.0f), BoxCheckSize, FColor::Red, false, 1);
 		for (AActor* actor : OverlappingActors)
 		{
 			if (actor->ActorHasTag("Player") || actor->ActorHasTag("Enemy"))

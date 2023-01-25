@@ -9,13 +9,9 @@
 /**
  * 
  */
-
 UCLASS()
-
 class PROJECTHALF_API AProjectHALFGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-
-
-
+	
 };

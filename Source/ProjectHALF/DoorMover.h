@@ -35,7 +35,7 @@ private:
 	UPROPERTY(EditAnywhere)
 		FVector OriginalLocation;
 	UPROPERTY(EditAnywhere)
-		FVector BoxCheckSize = FVector(300,400,400);
+		FVector BoxCheckSize;
 
 	UPROPERTY()
 		bool bShouldMove = false;
