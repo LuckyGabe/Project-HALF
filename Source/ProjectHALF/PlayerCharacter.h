@@ -32,7 +32,8 @@ protected:
 	bool RayTrace(FHitResult& OutHit, FVector& ShotDirection); // bool if raytracing was succesfull and return the results
 	void Interact();
 	void Shoot();
-
+	void Reload();
+	void ResetReload();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -40,6 +41,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+	UFUNCTION(BlueprintPure)
+		bool IsReloading() const;
 
 //Protected variables & components
 protected:
@@ -64,15 +68,18 @@ protected:
 		AGun* Gun;
 	UPROPERTY(EditDefaultsOnly)
 		float MaxHealth = 100;
-
+	UPROPERTY(EditDefaultsOnly)
+		float ReloadTime = 2;
 	UPROPERTY(VisibleAnywhere)
 		float Health;
+	UPROPERTY(VisibleAnywhere)
+		float CurrentAmmo = 0;
+	UPROPERTY(VisibleAnywhere)
+		float MagAmmo = 0;
 
+	UPROPERTY()
+		bool bIsReloading = false;
 
-//Public variables & components
-public:
-
-	
-	
+	FTimerHandle ReloadingHandle;
 	
 };

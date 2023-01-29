@@ -62,6 +62,7 @@ void AKeypad::CloseKeypad()
 		Keypad->RemoveFromViewport();
 		bIsOpened = false;
 		player = NULL;
+		
 	}
 
 }

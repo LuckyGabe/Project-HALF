@@ -50,6 +50,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (CurrentAmmo == 0 && Gun) { Reload(); }
+	
 }
 
 // Called to bind functionality to input
@@ -69,6 +71,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	//Bind actions
 	PlayerInputComponent->BindAction("Interact", EInputEvent::IE_Pressed, this, &APlayerCharacter::Interact);
 	PlayerInputComponent->BindAction("Shoot", EInputEvent::IE_Pressed, this, &APlayerCharacter::Shoot);
+	PlayerInputComponent->BindAction("Reload", EInputEvent::IE_Pressed, this, &APlayerCharacter::Reload);
 }
 
 void APlayerCharacter::MoveForward(float scale)
@@ -105,8 +108,9 @@ void APlayerCharacter::StopCrouch()
 }
 void APlayerCharacter::Shoot()
 {
-	if (Gun && Gun->bGunActive)
+	if (Gun && Gun->bGunActive && !bIsReloading)
 	{
+		CurrentAmmo--;
 		Gun->PullTrigger();
 	}
 }
@@ -143,6 +147,7 @@ void APlayerCharacter::Interact()
 		
 		AActor* hitActor = hitResult.GetActor();
 	
+			//If picking up a gun
 		if (hitActor != nullptr && hitActor->GetRootComponent()->ComponentHasTag(FName("Gun"))) // if the object is a gun
 		{
 			APickable* pickable = Cast<APickable>(hitActor); //cast the pickable script
@@ -154,10 +159,12 @@ void APlayerCharacter::Interact()
 				Gun->bGunActive = true;
 				Gun->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::KeepRelativeTransform, TEXT("GunSocket"));
 				Gun->SetOwner(this);
-				
+				CurrentAmmo = 12;
+				MagAmmo = 12;
 			}
 			else { UE_LOG(LogTemp, Warning, TEXT("Failed to cast gun in Interact() function")); }
 		}
+		//If picking up ammunition
 		else if (hitActor != nullptr && hitActor->GetRootComponent()->ComponentHasTag(FName("Ammo"))) // if the object is an ammunition
 		{
 			if (Cast<APickable>(hitActor)) // prevent crashing
@@ -167,10 +174,7 @@ void APlayerCharacter::Interact()
 				{
 					pickable->PickedUp(); //pick up the gun
 
-					/*
-					ADD AMMO
-
-					*/
+					MagAmmo += 12;
 				}
 			}
 			else { UE_LOG(LogTemp, Warning, TEXT("Failed to cast ammo in Interact() function")); }
@@ -212,5 +216,35 @@ float APlayerCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const
 
 	UE_LOG(LogTemp, Warning, TEXT("Health left: %f"), Health);
 	return DamageApplied;
+
+}
+
+
+bool APlayerCharacter::IsReloading() const
+{
+
+	return bIsReloading;
+
+}
+
+void APlayerCharacter::Reload()
+{
+	if (Gun && CurrentAmmo < 12)
+	{
+		bIsReloading = true;
+
+		float amount = 12 - CurrentAmmo;
+		MagAmmo -= amount;
+		CurrentAmmo += amount;
+		GetWorldTimerManager().SetTimer(ReloadingHandle, this, &APlayerCharacter::ResetReload, ReloadTime, false);
+		UE_LOG(LogTemp, Warning, TEXT("Reloading"));
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Failed to Reload"));
+
+}
+
+void APlayerCharacter::ResetReload()
+{
+	bIsReloading = false;
 
 }

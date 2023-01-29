@@ -43,4 +43,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 		float Health = 20;
+
+	bool bExploded = false;
 };

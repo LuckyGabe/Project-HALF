@@ -7,12 +7,12 @@
 #include "DoorMover.generated.h"
 
 class UBoxComponent;
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PROJECTHALF_API UDoorMover : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	// Sets default values for this component's properties
 	UDoorMover();
 
@@ -20,9 +20,12 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UPROPERTY(BlueprintReadWrite)
+		bool bShouldMove = false;
 
 private:
 
@@ -35,10 +38,8 @@ private:
 	UPROPERTY(EditAnywhere)
 		FVector OriginalLocation;
 	UPROPERTY(EditAnywhere)
-		FVector BoxCheckSize = FVector(300,400,400);
+		FVector BoxCheckSize = FVector(300, 400, 400);
 
-	UPROPERTY()
-		bool bShouldMove = false;
 
 	UPROPERTY(EditAnywhere)
 		float MoveTime = 2;

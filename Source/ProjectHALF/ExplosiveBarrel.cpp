@@ -39,37 +39,43 @@ float AExplosiveBarrel::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 void AExplosiveBarrel::Explode()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Explode"));
-
-	//the start and end location of trace can be the same since the radius of the sphere trace is used
-	const FVector Start = GetActorLocation();
-	const FVector End = GetActorLocation();
-	TArray<AActor*> IgnoredActors;
-	IgnoredActors.Add(this);
-	TArray<FHitResult> HitResultArray;
-	
-	if (Explosion != nullptr) 
+	if (!bExploded)
 	{
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Explosion, GetActorLocation());
-	}
-	
-	bool Hit = UKismetSystemLibrary::SphereTraceMulti(
-		GetWorld(), Start, End, ExplosionRadius, 
-		UEngineTypes::ConvertToTraceType(ECC_Camera), false, IgnoredActors, EDrawDebugTrace::None, 
-		HitResultArray, true);
 
-	if (Hit)
-	{
-		for (int i = 0; i < HitResultArray.Num(); i++)
+		bExploded = true;
+		//the start and end location of trace can be the same since the radius of the sphere trace is used
+		const FVector Start = GetActorLocation();
+		const FVector End = GetActorLocation();
+		TArray<AActor*> IgnoredActors;
+		IgnoredActors.Add(this);
+		TArray<FHitResult> HitResultArray;
+		
+
+		if (Explosion != nullptr)
 		{
-			FPointDamageEvent DamageEvent(Damage, HitResultArray[i], GetActorLocation(), nullptr);
-			AActor* ActorInRange = HitResultArray[i].GetActor();
-			if (ActorInRange != nullptr) 
-			{
-				ActorInRange->TakeDamage(Damage, DamageEvent, NULL, this);
-			}
-			
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Explosion, GetActorLocation());
+		
 		}
+
+		bool Hit = UKismetSystemLibrary::SphereTraceMulti(
+			GetWorld(), Start, End, ExplosionRadius,
+			UEngineTypes::ConvertToTraceType(ECC_Camera), false, IgnoredActors, EDrawDebugTrace::None,
+			HitResultArray, true);
+
+		if (Hit)
+		{
+			for (int i = 0; i < HitResultArray.Num(); i++)
+			{
+				FPointDamageEvent DamageEvent(Damage, HitResultArray[i], GetActorLocation(), nullptr);
+				AActor* ActorInRange = HitResultArray[i].GetActor();
+
+				if (ActorInRange != nullptr)
+				{
+					ActorInRange->TakeDamage(Damage, DamageEvent, NULL, this);
+				}
+
+			}
+		}
+		SetLifeSpan(0.2f);
 	}
-	Destroy();
 }

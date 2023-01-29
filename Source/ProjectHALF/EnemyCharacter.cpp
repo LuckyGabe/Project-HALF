@@ -71,8 +71,6 @@ float AEnemyCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const&
 	health -= damageApplied;
 	if (IsDead())
 	{
-
-		//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		DetachFromControllerPendingDestroy();
 	}
 
