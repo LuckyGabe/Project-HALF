@@ -44,6 +44,16 @@ public:
 
 	UFUNCTION(BlueprintPure)
 		bool IsReloading() const;
+	UFUNCTION(BlueprintPure)
+		float GetHealthPercent() const;
+	UFUNCTION(BlueprintPure)
+		FString GetHealthText() const;
+	UPROPERTY(BlueprintReadWrite)
+		bool bHasGun = false;
+	UFUNCTION(BlueprintPure)
+		float GetMagAmmunition() const;
+	UFUNCTION(BlueprintPure)
+		float GetAmmunition() const;
 
 //Protected variables & components
 protected:
@@ -72,10 +82,12 @@ protected:
 		float ReloadTime = 2;
 	UPROPERTY(VisibleAnywhere)
 		float Health;
-	UPROPERTY(VisibleAnywhere)
-		float CurrentAmmo = 0;
+	// ammunition in the magazine
 	UPROPERTY(VisibleAnywhere)
 		float MagAmmo = 0;
+	//how much ammunition the player has
+	UPROPERTY(VisibleAnywhere)
+		float Ammo = 0;
 
 	UPROPERTY()
 		bool bIsReloading = false;

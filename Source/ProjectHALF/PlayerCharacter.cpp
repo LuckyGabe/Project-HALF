@@ -25,8 +25,9 @@ APlayerCharacter::APlayerCharacter()
 	CameraComponent->SetRelativeLocation(FVector(-39.56f, 1.75f, 64.f)); // Position the camera
 	CameraComponent->bUsePawnControlRotation = true;
 
-	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
+	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPS_Arms"));
 	SkeletalMesh->SetupAttachment(CameraComponent);
+	SkeletalMesh->SetOwnerNoSee(true);
 }
 
 // Called when the game starts or when spawned
@@ -50,7 +51,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (CurrentAmmo == 0 && Gun) { Reload(); }
+	if (MagAmmo == 0 && Gun && Ammo>0) { Reload(); }
 	
 }
 
@@ -108,9 +109,9 @@ void APlayerCharacter::StopCrouch()
 }
 void APlayerCharacter::Shoot()
 {
-	if (Gun && Gun->bGunActive && !bIsReloading)
+	if (Gun && Gun->bGunActive && !bIsReloading && MagAmmo>0)
 	{
-		CurrentAmmo--;
+		MagAmmo--;
 		Gun->PullTrigger();
 	}
 }
@@ -153,14 +154,15 @@ void APlayerCharacter::Interact()
 			APickable* pickable = Cast<APickable>(hitActor); //cast the pickable script
 			if (pickable && pickable->GetActive()) // make sure it's not a null pointer and the item is active
 			{
+				SkeletalMesh->SetOwnerNoSee(false);
 				pickable->PickedUp(); //pick up the gun
 
 				Gun = GetWorld()->SpawnActor<AGun>(GunBP);
 				Gun->bGunActive = true;
 				Gun->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::KeepRelativeTransform, TEXT("GunSocket"));
 				Gun->SetOwner(this);
-				CurrentAmmo = 12;
 				MagAmmo = 12;
+				Ammo = 12;
 			}
 			else { UE_LOG(LogTemp, Warning, TEXT("Failed to cast gun in Interact() function")); }
 		}
@@ -173,7 +175,7 @@ void APlayerCharacter::Interact()
 				if (pickable->GetActive())
 				{
 					pickable->PickedUp(); //pick up the gun
-
+					bHasGun = true;
 					MagAmmo += 12;
 				}
 			}
@@ -229,13 +231,13 @@ bool APlayerCharacter::IsReloading() const
 
 void APlayerCharacter::Reload()
 {
-	if (Gun && CurrentAmmo < 12)
+	if (Gun && MagAmmo < 12)
 	{
 		bIsReloading = true;
 
-		float amount = 12 - CurrentAmmo;
-		MagAmmo -= amount;
-		CurrentAmmo += amount;
+		float amount = 12 - MagAmmo;
+		Ammo -= amount;
+		MagAmmo += amount;
 		GetWorldTimerManager().SetTimer(ReloadingHandle, this, &APlayerCharacter::ResetReload, ReloadTime, false);
 		UE_LOG(LogTemp, Warning, TEXT("Reloading"));
 	}
@@ -247,4 +249,27 @@ void APlayerCharacter::ResetReload()
 {
 	bIsReloading = false;
 
+}
+
+float APlayerCharacter::GetHealthPercent() const
+{
+	return (Health / MaxHealth)*100;
+}
+
+float APlayerCharacter::GetMagAmmunition() const
+{
+	return MagAmmo;
+}
+
+float APlayerCharacter::GetAmmunition() const
+{
+	return Ammo;
+}
+
+FString APlayerCharacter::GetHealthText() const
+{
+	FString HealthPercText = FString::SanitizeFloat(GetHealthPercent());
+	FString text = "Health: " + HealthPercText + "%";
+
+	return text;
 }
