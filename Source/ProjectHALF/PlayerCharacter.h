@@ -60,8 +60,8 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComponent;
 
-	UPROPERTY(EditAnywhere)
-		USkeletalMeshComponent* SkeletalMesh;
+	UPROPERTY(VisibleAnywhere)
+	USkeletalMeshComponent* SkeletalMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	float TurnRate;

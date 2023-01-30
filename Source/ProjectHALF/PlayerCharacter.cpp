@@ -12,6 +12,7 @@
 #include "DrawDebugHelpers.h"
 #include "ReadableNote.h"
 #include "Keypad.h"
+#include "ElevatorButton.h"
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
@@ -26,7 +27,10 @@ APlayerCharacter::APlayerCharacter()
 	CameraComponent->bUsePawnControlRotation = true;
 
 	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPS_Arms"));
-	SkeletalMesh->SetupAttachment(CameraComponent);
+	SkeletalMesh->SetupAttachment(CameraComponent);	
+
+	SkeletalMesh->bCastDynamicShadow = false;
+	SkeletalMesh->CastShadow = false;
 
 	
 }
@@ -140,7 +144,6 @@ void APlayerCharacter::Interact()
 	//store trace results
 	FVector shotDirection;
 	FHitResult hitResult;
-
 	bool bSuccess = RayTrace(hitResult, shotDirection);
 
 	if (bSuccess)
@@ -192,17 +195,29 @@ void APlayerCharacter::Interact()
 				note->player = Cast<APawn>(this);
 			}
 		}
-		else if (hitActor != nullptr && hitActor->GetRootComponent()->ComponentHasTag(FName("Keypad"))) // if the object is an ammunition
+		else if (hitActor != nullptr && hitActor->GetRootComponent()->ComponentHasTag(FName("Button"))) // if the object is an ammunition
 		{
 
-			AKeypad* keypad = Cast<AKeypad>(hitActor);
-			if (keypad && !keypad->IsOpened())
+			AElevatorButton* button = Cast<AElevatorButton>(hitActor);
+			if (button && !button->bIsPressed)
 			{
-				keypad->OpenKeypad();
-				keypad->PlayerPos = GetActorLocation();
-				keypad->player = Cast<APawn>(this);
+				button->Press();
+				
 			}
 		}
+
+
+		//else if (hitActor != nullptr && hitActor->GetRootComponent()->ComponentHasTag(FName("Keypad"))) // if the object is an ammunition
+		//{
+
+		//	AKeypad* keypad = Cast<AKeypad>(hitActor);
+		//	if (keypad && !keypad->IsOpened())
+		//	{
+		//		keypad->OpenKeypad();
+		//		keypad->PlayerPos = GetActorLocation();
+		//		keypad->player = Cast<APawn>(this);
+		//	}
+		//}
 
 
 	}
@@ -230,13 +245,25 @@ bool APlayerCharacter::IsReloading() const
 
 void APlayerCharacter::Reload()
 {
-	if (Gun && MagAmmo < 12)
+	if (Gun && MagAmmo < 12 && Ammo>0)
 	{
 		bIsReloading = true;
 
 		float amount = 12 - MagAmmo;
-		Ammo -= amount;
-		MagAmmo += amount;
+
+		for(int i =0;i<amount;i++)
+		{
+			if(Ammo>0)
+			{
+				Ammo--;
+				MagAmmo++;
+
+			if (Ammo < 0) { Ammo = 0; }
+			}
+		
+		
+		}
+
 		GetWorldTimerManager().SetTimer(ReloadingHandle, this, &APlayerCharacter::ResetReload, ReloadTime, false);
 		UE_LOG(LogTemp, Warning, TEXT("Reloading"));
 	}
