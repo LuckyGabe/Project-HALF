@@ -27,14 +27,14 @@ APlayerCharacter::APlayerCharacter()
 
 	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPS_Arms"));
 	SkeletalMesh->SetupAttachment(CameraComponent);
-	SkeletalMesh->SetOwnerNoSee(true);
+
+	
 }
 
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	if (playerController != nullptr) 
 	{
@@ -154,9 +154,8 @@ void APlayerCharacter::Interact()
 			APickable* pickable = Cast<APickable>(hitActor); //cast the pickable script
 			if (pickable && pickable->GetActive()) // make sure it's not a null pointer and the item is active
 			{
-				SkeletalMesh->SetOwnerNoSee(false);
+				bHasGun = true;
 				pickable->PickedUp(); //pick up the gun
-
 				Gun = GetWorld()->SpawnActor<AGun>(GunBP);
 				Gun->bGunActive = true;
 				Gun->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::KeepRelativeTransform, TEXT("GunSocket"));
@@ -175,7 +174,7 @@ void APlayerCharacter::Interact()
 				if (pickable->GetActive())
 				{
 					pickable->PickedUp(); //pick up the gun
-					bHasGun = true;
+					
 					MagAmmo += 12;
 				}
 			}
