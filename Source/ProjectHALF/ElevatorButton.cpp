@@ -42,14 +42,14 @@ void AElevatorButton::Tick(float DeltaTime)
 
 void AElevatorButton::Press()
 {
-	bIsPressed = true;
+	
 	if(bHasPower)
 	{
-	
+	bIsPressed = true;
 		// load next level
 	
-	
+	UE_LOG(LogTemp, Warning, TEXT("Button Pressed"));
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Button Pressed"));
+	
 }

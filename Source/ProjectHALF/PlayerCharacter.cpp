@@ -279,7 +279,7 @@ void APlayerCharacter::ResetReload()
 
 float APlayerCharacter::GetHealthPercent() const
 {
-	return (Health / MaxHealth)*100;
+	return (Health / MaxHealth);
 }
 
 float APlayerCharacter::GetMagAmmunition() const
@@ -294,7 +294,7 @@ float APlayerCharacter::GetAmmunition() const
 
 FString APlayerCharacter::GetHealthText() const
 {
-	FString HealthPercText = FString::SanitizeFloat(GetHealthPercent());
+	FString HealthPercText = FString::SanitizeFloat(GetHealthPercent()* 100.f);
 	FString text = "Health: " + HealthPercText + "%";
 
 	return text;
