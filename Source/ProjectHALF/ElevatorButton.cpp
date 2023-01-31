@@ -2,6 +2,7 @@
 
 
 #include "ElevatorButton.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AElevatorButton::AElevatorButton()
@@ -17,6 +18,7 @@ void AElevatorButton::BeginPlay()
 {
 	Super::BeginPlay();
 	OriginalLocation = GetActorLocation();
+	
 }
 
 // Called every frame
@@ -47,7 +49,8 @@ void AElevatorButton::Press()
 	{
 	bIsPressed = true;
 		// load next level
-	
+	UGameplayStatics::OpenLevel(this, LevelToOpen);
+
 	UE_LOG(LogTemp, Warning, TEXT("Button Pressed"));
 	}
 

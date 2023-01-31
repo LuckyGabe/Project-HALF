@@ -3,6 +3,7 @@
 
 #include "EnemyCharacter.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Gun.h"
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
@@ -36,7 +37,11 @@ void AEnemyCharacter::BeginPlay()
 void AEnemyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (health <= 0)
+	{
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		DetachFromControllerPendingDestroy();
+	}
 }
 
 
@@ -55,15 +60,15 @@ void AEnemyCharacter::Shoot()
 }
 bool AEnemyCharacter::IsDead() const
 {
-	if (health <= 0) { return true; }
+	if (health <= 0) {   return true; }
 	else return false;
 }
 
 float AEnemyCharacter::GetHealthPercentage() const
 {
-
 	return health / maxHealth;
 }
+
 float AEnemyCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
 	float damageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);

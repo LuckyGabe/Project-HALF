@@ -37,5 +37,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 		UStaticMeshComponent* ButtonMesh;
-
+	UPROPERTY(EditAnywhere)
+		FName LevelToOpen;
 };

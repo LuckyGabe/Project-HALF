@@ -207,7 +207,7 @@ void APlayerCharacter::Interact()
 		}
 
 
-		//else if (hitActor != nullptr && hitActor->GetRootComponent()->ComponentHasTag(FName("Keypad"))) // if the object is an ammunition
+		//else if (hitActor != nullptr && hitActor->GetRootComponent()->ComponentHasTag(FName("Keypad"))) 
 		//{
 
 		//	AKeypad* keypad = Cast<AKeypad>(hitActor);

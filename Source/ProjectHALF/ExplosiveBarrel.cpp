@@ -4,6 +4,7 @@
 #include "ExplosiveBarrel.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+
 // Sets default values
 AExplosiveBarrel::AExplosiveBarrel()
 {
@@ -18,7 +19,7 @@ AExplosiveBarrel::AExplosiveBarrel()
 void AExplosiveBarrel::BeginPlay()
 {
 	Super::BeginPlay();
-		
+
 }
 
 // Called every frame

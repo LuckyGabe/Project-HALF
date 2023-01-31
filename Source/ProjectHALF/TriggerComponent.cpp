@@ -49,29 +49,12 @@ AActor* UTriggerComponent::GetAllowedActor() const
 void UTriggerComponent::EnableElevator()
 {
 
-const FVector Start = GetComponentLocation();
-		const FVector End = GetComponentLocation();
-		TArray<AActor*> IgnoredActors;
-		IgnoredActors.Add(GetOwner());
-		TArray<FHitResult> HitResultArray;
-		bool Hit = UKismetSystemLibrary::SphereTraceMulti(
-			GetWorld(), Start, End, 100.0f,
-			UEngineTypes::ConvertToTraceType(ECC_Camera), false, IgnoredActors, EDrawDebugTrace::None,
-			HitResultArray, true);
-		if (Hit)
-		{
-			for (FHitResult hitActor : HitResultArray)
-			{
-			
-				AElevatorButton* button = Cast<AElevatorButton>(hitActor.GetActor());
+	AElevatorButton* button = Cast<AElevatorButton>(GetOwner());
+	
+					if (button != nullptr)
+					{
+						button->bHasPower = true;
+					}
 
-				if (button != nullptr)
-				{
-					button->bHasPower = true;
-					UE_LOG(LogTemp, Warning, TEXT("Power restored"));
-				}
-
-			}
-		}
 
 }
