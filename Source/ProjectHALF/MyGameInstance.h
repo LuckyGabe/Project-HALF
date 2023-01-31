@@ -13,5 +13,16 @@ UCLASS()
 class PROJECTHALF_API UMyGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
-	
+
+
+public:
+	float ammo;
+	float magAmmo;
+	UPROPERTY(EditAnywhere)
+	float health;
+	UPROPERTY()
+		class AGun* Gun;
+
+	UFUNCTION(BlueprintCallable)
+	void MyFunction();
 };

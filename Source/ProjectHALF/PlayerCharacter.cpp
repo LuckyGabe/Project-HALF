@@ -299,3 +299,19 @@ FString APlayerCharacter::GetHealthText() const
 
 	return text;
 }
+
+void APlayerCharacter::SavePlayerData( float& OutHealth,  float& OutAmmo,  float& OutMagAmmo, bool& bPlayerHasGun)
+{
+	OutHealth = this->Health;
+	OutAmmo = this->Ammo;
+	OutMagAmmo = this->MagAmmo;
+	bPlayerHasGun = this->bHasGun;
+}
+
+void APlayerCharacter::LoadPlayerData(float NewHealth, float NewAmmo, float NewMagAmmo, bool bPlayerHasGun)
+{
+	this->Health = NewHealth;
+	this->Ammo = NewAmmo; 
+	this->MagAmmo = NewMagAmmo;
+	this->bHasGun = bPlayerHasGun;
+}

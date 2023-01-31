@@ -42,6 +42,14 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+
+	UFUNCTION(BlueprintCallable)
+	void SavePlayerData(float& OutHealth, float& OutAmmo, float& OutMagAmmo, bool & bPlayerHasGun);
+
+	UFUNCTION(BlueprintCallable)
+		void LoadPlayerData(float NewHealth, float NewAmmo, float NewMagAmmo, bool bPlayerHasGun);
+
+	//These function are for the UI
 	UFUNCTION(BlueprintPure)
 		bool IsReloading() const;
 	UFUNCTION(BlueprintPure)
