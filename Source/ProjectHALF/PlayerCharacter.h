@@ -22,7 +22,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
+private:
 	void MoveForward(float scale); //Move forward/backward
 	void MoveRight(float scale); // Move left/right
 	void Turn(float scale);
@@ -34,6 +34,9 @@ protected:
 	void Shoot();
 	void Reload();
 	void ResetReload();
+	void Heal();
+	int MedKitsNumb;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -44,11 +47,12 @@ public:
 
 
 	UFUNCTION(BlueprintCallable)
-	void SavePlayerData(float& OutHealth, float& OutAmmo, float& OutMagAmmo, bool & bPlayerHasGun);
+	void SavePlayerData(float& OutHealth, float& OutAmmo, float& OutMagAmmo,int& OutMedKitsNumb, bool & bPlayerHasGun);
 
 	UFUNCTION(BlueprintCallable)
-		void LoadPlayerData(float NewHealth, float NewAmmo, float NewMagAmmo, bool bPlayerHasGun);
-
+		void LoadPlayerData(float NewHealth, float NewAmmo, float NewMagAmmo,int NewMedKitsNumb, bool bPlayerHasGun);
+	UFUNCTION()
+		void SpawnGun();
 	//These function are for the UI
 	UFUNCTION(BlueprintPure)
 		bool IsReloading() const;
@@ -62,6 +66,10 @@ public:
 		float GetMagAmmunition() const;
 	UFUNCTION(BlueprintPure)
 		float GetAmmunition() const;
+	UFUNCTION(BlueprintPure)
+	int GetMedKitsNumb() const;
+	UFUNCTION(BlueprintCallable)
+	void PauseGame();
 
 //Protected variables & components
 protected:
@@ -101,5 +109,14 @@ protected:
 		bool bIsReloading = false;
 
 	FTimerHandle ReloadingHandle;
-	
+
+	UPROPERTY(EditAnywhere)
+		USoundBase* PlayerHurtSound;
+
+	UPROPERTY(EditAnywhere)
+		USoundBase* ReloadingSound;
+
+
+	UPROPERTY(EditAnywhere)
+		USoundBase* DeathSound;
 };

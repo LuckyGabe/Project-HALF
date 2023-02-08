@@ -8,7 +8,7 @@
 // Sets default values
 AGun::AGun()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	root = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
@@ -22,7 +22,7 @@ AGun::AGun()
 void AGun::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -51,7 +51,7 @@ bool AGun::GunTrace(FHitResult& OutHit, FVector& ShotDirection)
 	params.AddIgnoredActor(GetOwner());
 
 	ShotDirection = -rotation.Vector();
-	
+
 	return  GetWorld()->LineTraceSingleByChannel(OutHit, location, endPoint, ECollisionChannel::ECC_GameTraceChannel3, params);
 }
 
@@ -66,9 +66,13 @@ AController* AGun::GetOwnerController() const
 
 void AGun::PullTrigger()
 {
-	if (MuzzleFlash != nullptr) 
+	if (MuzzleFlash != nullptr)
 	{
 		UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, GunMesh, FName("MuzzleFlashSocket"));
+	}
+	if (MuzzleSound)
+	{
+		UGameplayStatics::SpawnSoundAttached(MuzzleSound, GunMesh, TEXT("MuzzleFlashSocket"));
 	}
 
 	FVector shotDirection; //store shot direction
@@ -78,10 +82,21 @@ void AGun::PullTrigger()
 
 	if (bSuccess)
 	{
-		if(ImpactEffect!= nullptr)
+		if (ImpactEffect != nullptr)
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, hitResult.Location, shotDirection.Rotation(), true);
+			
 		}
+		if(ImpactSound != nullptr)
+		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSound, hitResult.Location);
+		}
+		if(hitResult.Actor->ActorHasTag("Glass") && GlassBreakingSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), GlassBreakingSound, hitResult.Location);
+
+		}
+
 
 		FPointDamageEvent DamageEvent(damage, hitResult, shotDirection, nullptr);
 		AActor* hitActor = hitResult.GetActor();

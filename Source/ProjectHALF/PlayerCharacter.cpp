@@ -13,40 +13,45 @@
 #include "ReadableNote.h"
 #include "Keypad.h"
 #include "ElevatorButton.h"
+#include "ProjectHALFPlayerController.h"
+
+
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	RootComponent = GetCapsuleComponent(); //set the capsule as a root component for the character
-	
+
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent"); // create a camera
 	CameraComponent->SetupAttachment(RootComponent); //attach camera to the root component
 	CameraComponent->SetRelativeLocation(FVector(-39.56f, 1.75f, 64.f)); // Position the camera
 	CameraComponent->bUsePawnControlRotation = true;
 
+	//create fps arms
 	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPS_Arms"));
-	SkeletalMesh->SetupAttachment(CameraComponent);	
+	SkeletalMesh->SetupAttachment(CameraComponent);
 
 	SkeletalMesh->bCastDynamicShadow = false;
 	SkeletalMesh->CastShadow = false;
 
-	
+
 }
 
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (playerController != nullptr) 
+	if (playerController != nullptr)
 	{
 		playerController->bEnableMouseOverEvents = true; // enable mouse over events
 	}
-	else { UE_LOG(LogTemp, Error, TEXT("Failed to get player controller")); }
+
 	Health = MaxHealth;
-	
+
 }
 
 
@@ -54,9 +59,9 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	//if the is no more ammo in the magazine, reload
+	if (MagAmmo == 0 && Gun && Ammo > 0) { Reload(); }
 
-	if (MagAmmo == 0 && Gun && Ammo>0) { Reload(); }
-	
 }
 
 // Called to bind functionality to input
@@ -77,24 +82,29 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("Interact", EInputEvent::IE_Pressed, this, &APlayerCharacter::Interact);
 	PlayerInputComponent->BindAction("Shoot", EInputEvent::IE_Pressed, this, &APlayerCharacter::Shoot);
 	PlayerInputComponent->BindAction("Reload", EInputEvent::IE_Pressed, this, &APlayerCharacter::Reload);
+	PlayerInputComponent->BindAction("Heal", EInputEvent::IE_Pressed, this, &APlayerCharacter::Heal);
+	PlayerInputComponent->BindAction("Pause", EInputEvent::IE_Pressed, this, &APlayerCharacter::PauseGame);
 }
 
 void APlayerCharacter::MoveForward(float scale)
 {
 	AddMovementInput(GetActorForwardVector(), scale); // Move the character forward if the scale is 1 and backwards if the scale is -1
+
+
 }
 
 void APlayerCharacter::MoveRight(float scale)
 {
+
 	AddMovementInput(GetActorRightVector(), scale); //Move actor right if the scale is 1 and left if it is -1
-	
+
 }
 
 void APlayerCharacter::Turn(float scale)
 {
-
 	AddControllerYawInput(scale * TurnRate * GetWorld()->GetDeltaSeconds());
 }
+
 void APlayerCharacter::LookUp(float scale)
 {
 	// calculate delta for this frame from the rate information
@@ -103,26 +113,33 @@ void APlayerCharacter::LookUp(float scale)
 
 void APlayerCharacter::StartCrouch()
 {
+
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true; //enable crouching
 	Crouch();
-	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+
 }
 
 void APlayerCharacter::StopCrouch()
 {
 	UnCrouch();
 }
+
+
 void APlayerCharacter::Shoot()
 {
-	if (Gun && Gun->bGunActive && !bIsReloading && MagAmmo>0)
+	//only shoot if player has a gun and ammunition in the magazine
+	if (Gun && Gun->bGunActive && !bIsReloading && MagAmmo > 0)
 	{
 		MagAmmo--;
+
+		//call gun's function
 		Gun->PullTrigger();
 	}
 }
 
 bool APlayerCharacter::RayTrace(FHitResult& OutHit, FVector& ShotDirection)
 {
-	
+
 	FVector location;										  //
 	FRotator rotation;										 // Get the location and rotation of player viewpoint
 	GetController()->GetPlayerViewPoint(location, rotation);//
@@ -133,8 +150,6 @@ bool APlayerCharacter::RayTrace(FHitResult& OutHit, FVector& ShotDirection)
 	params.AddIgnoredActor(GetOwner()); // ignore the player's collider
 	ShotDirection = -rotation.Vector(); // shot the ray where the player's looking
 
-	//DrawDebugPoint(GetWorld(), endPoint, 40.f, FColor::Red, true, 50.f);
-	
 	//return the ray trace results
 	return  GetWorld()->LineTraceSingleByChannel(OutHit, location, endPoint, ECollisionChannel::ECC_GameTraceChannel1, params);
 }
@@ -148,10 +163,10 @@ void APlayerCharacter::Interact()
 
 	if (bSuccess)
 	{
-		
+
 		AActor* hitActor = hitResult.GetActor();
-	
-			//If picking up a gun
+
+		//If picking up a gun
 		if (hitActor != nullptr && hitActor->GetRootComponent()->ComponentHasTag(FName("Gun"))) // if the object is a gun
 		{
 			APickable* pickable = Cast<APickable>(hitActor); //cast the pickable script
@@ -159,17 +174,17 @@ void APlayerCharacter::Interact()
 			{
 				bHasGun = true;
 				pickable->PickedUp(); //pick up the gun
-				Gun = GetWorld()->SpawnActor<AGun>(GunBP);
-				Gun->bGunActive = true;
-				Gun->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::KeepRelativeTransform, TEXT("GunSocket"));
-				Gun->SetOwner(this);
+
+				SpawnGun();
+
+				//set ammunition
 				MagAmmo = 12;
 				Ammo = 12;
 			}
-			else { UE_LOG(LogTemp, Warning, TEXT("Failed to cast gun in Interact() function")); }
 		}
+
 		//If picking up ammunition
-		else if (hitActor != nullptr && hitActor->GetRootComponent()->ComponentHasTag(FName("Ammo"))) // if the object is an ammunition
+		else if (hitActor != nullptr && hitActor->ActorHasTag("Ammo")) // if the object is an ammunition
 		{
 			if (Cast<APickable>(hitActor)) // prevent crashing
 			{
@@ -177,32 +192,55 @@ void APlayerCharacter::Interact()
 				if (pickable->GetActive())
 				{
 					pickable->PickedUp(); //pick up the gun
-					
-					MagAmmo += 12;
+
+					Ammo += 12; //add ammunition
+				}
+			}
+
+
+		}
+
+		//If picking up Health kit
+		else if (hitActor != nullptr && hitActor->ActorHasTag("Medkit")) // if the object is a health kit
+		{
+			if (Cast<APickable>(hitActor)) // prevent crashing
+			{
+				APickable* pickable = Cast<APickable>(hitActor); //cast the pickable script
+				if (pickable->GetActive())
+				{
+					pickable->PickedUp(); //pick up the health kit
+
+					MedKitsNumb++; //add medkit
 				}
 			}
 			else { UE_LOG(LogTemp, Warning, TEXT("Failed to cast ammo in Interact() function")); }
 
 		}
-		else if (hitActor != nullptr && hitActor->GetRootComponent()->ComponentHasTag(FName("Note"))) // if the object is an ammunition
+
+		else if (hitActor != nullptr && hitActor->ActorHasTag("Note")) // if the object is a note pad
 		{
-			
+
 			AReadableNote* note = Cast<AReadableNote>(hitActor);
+
 			if (note && !note->IsOpened())
 			{
-				note->OpenNote();
+
+				note->OpenNote(); // open note
+
+				//set variables for the note
 				note->PlayerPos = GetActorLocation();
 				note->player = Cast<APawn>(this);
 			}
 		}
-		else if (hitActor != nullptr && hitActor->GetRootComponent()->ComponentHasTag(FName("Button"))) // if the object is an ammunition
+
+		else if (hitActor != nullptr && hitActor->ActorHasTag("Button")) // if the object is a button
 		{
 
 			AElevatorButton* button = Cast<AElevatorButton>(hitActor);
 			if (button && !button->bIsPressed)
 			{
 				button->Press();
-				
+
 			}
 		}
 
@@ -224,13 +262,35 @@ void APlayerCharacter::Interact()
 
 }
 
+//override TakeDamage function
 float APlayerCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
 	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	DamageApplied = FMath::Min(Health, DamageApplied);
-	Health -= DamageApplied;
 
-	UE_LOG(LogTemp, Warning, TEXT("Health left: %f"), Health);
+	DamageApplied = FMath::Min(Health, DamageApplied); //Damage applied can't be higher value than health
+
+	Health -= DamageApplied; //Decrease health
+
+	if (PlayerHurtSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), PlayerHurtSound);
+	}
+
+
+	if (Health <= 0)
+	{
+		AProjectHALFPlayerController* controller = Cast<AProjectHALFPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		if (controller)
+		{
+			controller->bGameOver = true;
+		}
+		if (DeathSound)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), DeathSound);
+		}
+
+
+	}
 	return DamageApplied;
 
 }
@@ -245,34 +305,37 @@ bool APlayerCharacter::IsReloading() const
 
 void APlayerCharacter::Reload()
 {
+	//if player has a gun and ammunition
 	if (Gun && MagAmmo < 12 && Ammo>0)
 	{
 		bIsReloading = true;
 
-		float amount = 12 - MagAmmo;
+		float amount = 12 - MagAmmo; //calculate the amount of bullets that will be moved to magazine
 
-		for(int i =0;i<amount;i++)
+		for (int i = 0; i < amount; i++)
 		{
-			if(Ammo>0)
+			if (Ammo > 0)
 			{
 				Ammo--;
 				MagAmmo++;
 
-			if (Ammo < 0) { Ammo = 0; }
+				if (Ammo < 0) { Ammo = 0; }
 			}
-		
-		
+
+
 		}
 
+		//reset reloading boolean
 		GetWorldTimerManager().SetTimer(ReloadingHandle, this, &APlayerCharacter::ResetReload, ReloadTime, false);
-		UE_LOG(LogTemp, Warning, TEXT("Reloading"));
+
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Failed to Reload"));
+
 
 }
 
 void APlayerCharacter::ResetReload()
 {
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), ReloadingSound, Gun->GetActorLocation());
 	bIsReloading = false;
 
 }
@@ -292,26 +355,77 @@ float APlayerCharacter::GetAmmunition() const
 	return Ammo;
 }
 
+int APlayerCharacter::GetMedKitsNumb() const
+{
+	return MedKitsNumb;
+}
+
 FString APlayerCharacter::GetHealthText() const
 {
-	FString HealthPercText = FString::SanitizeFloat(GetHealthPercent()* 100.f);
+	FString HealthPercText = FString::SanitizeFloat(GetHealthPercent() * 100.f);
 	FString text = "Health: " + HealthPercText + "%";
 
 	return text;
 }
 
-void APlayerCharacter::SavePlayerData( float& OutHealth,  float& OutAmmo,  float& OutMagAmmo, bool& bPlayerHasGun)
+void APlayerCharacter::SavePlayerData(float& OutHealth, float& OutAmmo, float& OutMagAmmo, int& OutMedKitsNumb, bool& bPlayerHasGun)
 {
 	OutHealth = this->Health;
 	OutAmmo = this->Ammo;
 	OutMagAmmo = this->MagAmmo;
+	OutMedKitsNumb = this->MedKitsNumb;
 	bPlayerHasGun = this->bHasGun;
 }
 
-void APlayerCharacter::LoadPlayerData(float NewHealth, float NewAmmo, float NewMagAmmo, bool bPlayerHasGun)
+void APlayerCharacter::LoadPlayerData(float NewHealth, float NewAmmo, float NewMagAmmo, int NewMedKitsNumb, bool bPlayerHasGun)
 {
 	this->Health = NewHealth;
-	this->Ammo = NewAmmo; 
+	this->Ammo = NewAmmo;
 	this->MagAmmo = NewMagAmmo;
 	this->bHasGun = bPlayerHasGun;
+	this->MedKitsNumb = NewMedKitsNumb;
+}
+
+void APlayerCharacter::SpawnGun()
+{
+	//spawn gun
+	Gun = GetWorld()->SpawnActor<AGun>(GunBP);
+
+	Gun->bGunActive = true;
+
+	//Attach to player's hand
+	Gun->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::KeepRelativeTransform, TEXT("GunSocket"));
+	//set the player as a owner of the gun
+	Gun->SetOwner(this);
+
+}
+
+void APlayerCharacter::Heal()
+{
+
+	if (MedKitsNumb > 0)
+	{
+		MedKitsNumb--;
+		Health += 40;
+
+	}
+
+}
+void APlayerCharacter::PauseGame()
+{
+	AProjectHALFPlayerController* controller = Cast<AProjectHALFPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (controller)
+	{
+		if (controller->bGamePaused)
+		{
+			controller->bGamePaused = false;
+		}
+		else
+		{
+			controller->bGamePaused = true;
+		}
+
+	}
+
+
 }

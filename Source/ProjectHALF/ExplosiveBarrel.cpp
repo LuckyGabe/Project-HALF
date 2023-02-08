@@ -42,7 +42,10 @@ void AExplosiveBarrel::Explode()
 {
 	if (!bExploded)
 	{
-
+		if (ExplosionSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), ExplosionSound, GetActorLocation());
+		}
 		bExploded = true;
 		//the start and end location of trace can be the same since the radius of the sphere trace is used
 		const FVector Start = GetActorLocation();

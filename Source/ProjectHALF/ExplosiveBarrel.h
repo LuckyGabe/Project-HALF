@@ -43,6 +43,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 		float Health = 20;
-
+	UPROPERTY(EditAnywhere)
+		USoundBase* ExplosionSound;
 	bool bExploded = false;
 };

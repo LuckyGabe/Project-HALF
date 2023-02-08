@@ -18,17 +18,17 @@ void UBTService_SetPlayerLocation::TickNode(UBehaviorTreeComponent& OwnerComp, u
 
 	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 
-	if (PlayerPawn == nullptr) { return; }
-	if (OwnerComp.GetAIOwner() == nullptr) { return; }
+	if (PlayerPawn == nullptr) { return; }				 //if any cast failed don't execute the rest of the code
+	if (OwnerComp.GetAIOwner() == nullptr) { return; }  //
 
-	if (OwnerComp.GetAIOwner()->LineOfSightTo(PlayerPawn))
+	if (OwnerComp.GetAIOwner()->LineOfSightTo(PlayerPawn)) //if the enemy can see the player
 	{
-
+		//set value in the blackboard
 		OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), PlayerPawn);
 	}
-	else 
+	else
 	{
-
+		//remove value from the blackboard
 		OwnerComp.GetBlackboardComponent()->ClearValue(GetSelectedBlackboardKey());
 
 	}

@@ -3,7 +3,7 @@
 
 #include "ElevatorButton.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "ProjectHALFPlayerController.h"
 // Sets default values
 AElevatorButton::AElevatorButton()
 {
@@ -45,14 +45,18 @@ void AElevatorButton::Tick(float DeltaTime)
 void AElevatorButton::Press()
 {
 	
-	if(bHasPower)
+	if(bHasPower && GetWorld()->GetMapName() != "Level2")
 	{
 	bIsPressed = true;
 		// load next level
 	UGameplayStatics::OpenLevel(this, LevelToOpen);
 
-	UE_LOG(LogTemp, Warning, TEXT("Button Pressed"));
 	}
-
+	if(bHasPower && GetWorld()->GetMapName() == "Level2")
+	{
+		AProjectHALFPlayerController* controller = Cast<AProjectHALFPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		controller->bGameWin = true;
+	
+	}
 	
 }

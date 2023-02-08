@@ -4,6 +4,7 @@
 #include "DoorMover.h"
 #include "Components/BoxComponent.h"
 #include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "DrawDebugHelpers.h"
 // Sets default values for this component's properties
@@ -57,16 +58,17 @@ void UDoorMover::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 	if (bShouldMove)
 	{
+
 		GetOwner()->SetActorLocation(NewLocation);
-		
+	
 	}
 
 	else
 	{
 		GetOwner()->SetActorLocation(DefaultLocation);
 
+		
 	}
-
 
 }
 
@@ -101,3 +103,4 @@ AActor* UDoorMover::GetAllowedActor() const
 		return nullptr;
 
 }
+

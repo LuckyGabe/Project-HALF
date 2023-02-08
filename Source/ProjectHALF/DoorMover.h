@@ -31,7 +31,7 @@ private:
 
 	AActor* Owner = GetOwner();
 	AActor* GetAllowedActor() const;
-
+	void ResetSound();
 	UPROPERTY(EditAnywhere)
 		FVector MoveOffSet;
 
@@ -40,8 +40,8 @@ private:
 	UPROPERTY(EditAnywhere)
 		FVector BoxCheckSize = FVector(300, 400, 400);
 
-
 	UPROPERTY(EditAnywhere)
-		float MoveTime = 2;
+		float MoveTime = 1;
+
 };
 

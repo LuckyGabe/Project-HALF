@@ -39,11 +39,12 @@ private:
 		UParticleSystem* MuzzleFlash;
 
 	UPROPERTY(EditAnywhere)
-		USoundBase* muzzleSound;
+		USoundBase* MuzzleSound;
 
 	UPROPERTY(EditAnywhere)
 		UParticleSystem* ImpactEffect;
-
+	UPROPERTY(EditAnywhere)
+		USoundBase* GlassBreakingSound;
 	UPROPERTY(EditAnywhere)
 		USoundBase* ImpactSound;
 
