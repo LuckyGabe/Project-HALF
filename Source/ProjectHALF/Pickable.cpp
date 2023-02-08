@@ -3,6 +3,8 @@
 
 #include "Pickable.h"
 #include "Components/StaticMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "ProjectHALFPlayerController.h"
 // Sets default values
 APickable::APickable()
 {
@@ -20,6 +22,8 @@ APickable::APickable()
 void APickable::BeginPlay()
 {
 	Super::BeginPlay();
+
+	PlayerController = Cast<AProjectHALFPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	Mesh->OnBeginCursorOver.AddDynamic(this, &APickable::ShowPickUpMessage);
 }
 
@@ -43,12 +47,20 @@ bool APickable::GetActive()
 
 void APickable::ShowPickUpMessage(UPrimitiveComponent* TouchedComponent)
 {
-	if (bActive) {
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, TEXT("Mouse Over"));
-		}
+	if (bActive && PlayerController) 
+	{
 
+		PlayerController->bShowPickUpMessage = true;
+		GetWorldTimerManager().SetTimer(TimerHandle, this, &APickable::HidePickUpMessage, 1.f, false);
+	}
+}
+
+void APickable::HidePickUpMessage()
+{
+	if (PlayerController)
+	{
+	
+	PlayerController->bShowPickUpMessage = false;
 	}
 }
 

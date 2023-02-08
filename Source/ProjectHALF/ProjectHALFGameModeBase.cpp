@@ -20,7 +20,7 @@ void AProjectHALFGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FString CurrentMapName = GetWorld()->GetMapName(); //get current map name
+	CurrentMapName = GetWorld()->GetMapName(); //get current map name
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0); //get player controller
 	UMyGameInstance* GameInstance = Cast<UMyGameInstance>(GetGameInstance()); //get game instance
 	PlayerController->bShowMouseCursor = false; //Hide mouse cursor
@@ -41,6 +41,7 @@ void AProjectHALFGameModeBase::BeginPlay()
 	if (CurrentMapName == "MainMenu")
 	{
 		PlayerController->SetShowMouseCursor(true);
+
 		GameInstance->ClearPlayerData();
 	}
 
@@ -70,18 +71,14 @@ void AProjectHALFGameModeBase::BeginPlay()
 		UGameplayStatics::PlaySound2D(GetWorld(), Level2StartEffects);
 	}
 
+
 }
 
 // Called every frame
 void AProjectHALFGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	UMyGameInstance* GameInstance = Cast<UMyGameInstance>(GetGameInstance()); //get game instance
-	if (GameInstance)
-	{
-		//save player data
-		GameInstance->SavePlayerData();
-	}
+	
 
 }
 
@@ -94,6 +91,7 @@ void AProjectHALFGameModeBase::AddLoadingScreenToViewport()
 	}
 
 }
+
 
 //add loading screen from viewport
 void AProjectHALFGameModeBase::RemoveLoadingScreen()

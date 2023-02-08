@@ -18,6 +18,13 @@ void AProjectHALFPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	FString CurrentMapName = GetWorld()->GetMapName(); //get current map name
+	
+	GetViewportSize(screenSizeX, ScreenSizeY);
+		
+	bGameOver = false;
+	bGamePaused = false;
+
+
 	//Add HUD to the viewport
 	if (HUDClass && CurrentMapName != "MainMenu")
 	{
@@ -25,8 +32,10 @@ void AProjectHALFPlayerController::BeginPlay()
 		
 		GetWorldTimerManager().SetTimer(LoadingScreenTimerHandle, this, &AProjectHALFPlayerController::DisplayHUD, 2.f, false);
 	}
-	bGameOver = false;
-	bGamePaused = false;
+	if(PickUpMessageClass)
+	{
+		PickUpMessage = CreateWidget<UUserWidget>(this, PickUpMessageClass);
+	}
 	
 	if (PauseMenuClass)
 	{
@@ -51,13 +60,15 @@ void AProjectHALFPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if(bLockMouse){ SetMouseLocation(screenSizeX/2, ScreenSizeY/2); }
+
 	//Pausing the game
 	if (PauseMenu)
 	{
 		if (bGamePaused && !PauseMenu->IsInViewport())
 		{
 			SetShowMouseCursor(true);
-
+			bLockMouse = false;
 			PauseMenu->AddToViewport(); // add pause menu to the viewport
 			SetPause(bGamePaused); //pause game
 		}
@@ -66,7 +77,8 @@ void AProjectHALFPlayerController::Tick(float DeltaTime)
 			SetShowMouseCursor(false);
 
 			PauseMenu->RemoveFromViewport();// remove pause menu from the viewport
-			SetPause(bGamePaused);
+			SetPause(bGamePaused); //unpause the game
+			bLockMouse = true;
 		}
 	}
 	if (GameOver)
@@ -77,12 +89,14 @@ void AProjectHALFPlayerController::Tick(float DeltaTime)
 
 			GameOver->AddToViewport(); // add game over screen to the viewport
 			SetPause(bGameOver); //pause game
+			bLockMouse = false;
 		}
 		else if (!bGameOver && GameOver->IsInViewport())
 		{
 			bShowMouseCursor = false;
 			GameOver->RemoveFromViewport();
-			SetPause(bGameOver);
+			SetPause(bGameOver); //unpause the game
+			bLockMouse = true;
 		}
 
 	}
@@ -95,17 +109,35 @@ void AProjectHALFPlayerController::Tick(float DeltaTime)
 
 			GameWin->AddToViewport(); // add game over screen to the viewport
 			SetPause(bGameWin); //pause game
+			bLockMouse = false;
 		}
 
 		else if (!GameWin && GameWin->IsInViewport())
 		{
 			bShowMouseCursor = false;
 			GameWin->RemoveFromViewport();
-			SetPause(bGameWin);
+			SetPause(bGameWin); //unpause the game
+			bLockMouse = true;
 		}
 
 	}
+	if (PickUpMessage)
+	{
+		if (bShowPickUpMessage && !PickUpMessage->IsInViewport())
+		{
+			
 
+			PickUpMessage->AddToViewport(); // add game over screen to the viewport
+		}
+
+		else if (!bShowPickUpMessage && PickUpMessage->IsInViewport())
+		{
+
+			PickUpMessage->RemoveFromViewport();
+
+		}
+
+	}
 
 }
 	

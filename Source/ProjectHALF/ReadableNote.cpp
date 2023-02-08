@@ -4,6 +4,7 @@
 #include "ReadableNote.h"
 #include <Blueprint/UserWidget.h>
 #include "Kismet/GameplayStatics.h"
+#include "ProjectHALFPlayerController.h"
 // Sets default values
 AReadableNote::AReadableNote()
 {
@@ -23,7 +24,11 @@ AReadableNote::AReadableNote()
 void AReadableNote::BeginPlay()
 {
 	Super::BeginPlay();
+	PlayerController = Cast<AProjectHALFPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	NoteMesh->SetWorldLocation(RootComponent->GetComponentLocation());
+	NoteMesh->OnBeginCursorOver.AddDynamic(this, &AReadableNote::ShowPickUpMessage);
+
+
 }
 
 // Called every frame
@@ -41,15 +46,12 @@ void AReadableNote::Tick(float DeltaTime)
 
 void AReadableNote::OpenNote()
 {
-	UE_LOG(LogTemp, Warning, TEXT("OpenNote"));
+
 	if (NoteClass)
 	{
 		APlayerController* controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 		Note = CreateWidget<UUserWidget>(controller, NoteClass);
 		Note->AddToViewport();
-
-		controller->bShowMouseCursor = true;
-
 
 		bIsOpened = true;
 	}
@@ -69,3 +71,22 @@ void AReadableNote::CloseNote()
 }
 
 bool AReadableNote::IsOpened() { return bIsOpened; }
+
+void AReadableNote::ShowPickUpMessage(UPrimitiveComponent* TouchedComponent)
+{
+	if (PlayerController)
+	{
+
+		PlayerController->bShowPickUpMessage = true;
+		GetWorldTimerManager().SetTimer(TimerHandle, this, &AReadableNote::HidePickUpMessage, 1.f, false);
+	}
+}
+
+void AReadableNote::HidePickUpMessage()
+{
+	if (PlayerController)
+	{
+
+		PlayerController->bShowPickUpMessage = false;
+	}
+}

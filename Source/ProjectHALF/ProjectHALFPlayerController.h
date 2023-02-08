@@ -25,6 +25,12 @@ public:
 
 	UPROPERTY()
 		bool bGamePaused = false;
+
+	UPROPERTY()
+		bool bLockMouse = true;
+	UPROPERTY()
+		bool bShowPickUpMessage = false;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -52,8 +58,15 @@ private:
 
 	UPROPERTY()
 		class UUserWidget* GameWin;
-	void DisplayHUD();
 
+	UPROPERTY(EditDefaultsOnly)
+		TSubclassOf<class UUserWidget> PickUpMessageClass;
+
+	UPROPERTY()
+		class UUserWidget* PickUpMessage;
+
+	void DisplayHUD();
+	int screenSizeX, ScreenSizeY;
 
 	/* Handle to manage the timer */
 	FTimerHandle LoadingScreenTimerHandle;

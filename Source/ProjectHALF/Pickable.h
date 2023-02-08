@@ -12,18 +12,17 @@ UCLASS()
 class PROJECTHALF_API APickable : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	APickable();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	UFUNCTION()
-	void ShowPickUpMessage(UPrimitiveComponent* TouchedComponent);
 
-public:	
+
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	void PickedUp();
@@ -31,7 +30,13 @@ public:
 
 private:
 	bool bActive;
-
+	/* Handle to manage the timer */
+	FTimerHandle TimerHandle;
+	class AProjectHALFPlayerController* PlayerController;
 	UPROPERTY(VisibleAnywhere)
 		UStaticMeshComponent* Mesh;
+	UFUNCTION()
+		void ShowPickUpMessage(UPrimitiveComponent* TouchedComponent);
+	UFUNCTION()
+		void HidePickUpMessage();
 };

@@ -10,8 +10,8 @@ UCLASS()
 class PROJECTHALF_API AReadableNote : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AReadableNote();
 
@@ -21,10 +21,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
+
 	APawn* player;
 	FVector PlayerPos;
 
@@ -39,12 +39,18 @@ private:
 	UPROPERTY(VisibleDefaultsOnly)
 		UStaticMeshComponent* NoteMesh;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 		TSubclassOf<class UUserWidget> NoteClass;
 
 	UPROPERTY()
 		class UUserWidget* Note;
 	bool bIsOpened = false;
-	
-	
+	UFUNCTION()
+		void ShowPickUpMessage(UPrimitiveComponent* TouchedComponent);
+	UFUNCTION()
+		void HidePickUpMessage();
+	class AProjectHALFPlayerController* PlayerController;
+	/* Handle to manage the timer */
+	FTimerHandle TimerHandle;
+
 };

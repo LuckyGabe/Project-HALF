@@ -24,6 +24,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void AddLoadingScreenToViewport();
 
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -36,7 +37,8 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 		TSubclassOf<class UUserWidget> LoadingScreenClass;
-
+	UPROPERTY()
+	FString CurrentMapName;
 	UPROPERTY()
 		class UUserWidget* LoadingScreen;
 	/* Handle to manage the timer */

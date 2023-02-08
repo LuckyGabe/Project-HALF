@@ -4,10 +4,11 @@
 #include "ElevatorButton.h"
 #include "Kismet/GameplayStatics.h"
 #include "ProjectHALFPlayerController.h"
+#include "MyGameInstance.h"
 // Sets default values
 AElevatorButton::AElevatorButton()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	ButtonMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	RootComponent = ButtonMesh;
@@ -18,7 +19,7 @@ void AElevatorButton::BeginPlay()
 {
 	Super::BeginPlay();
 	OriginalLocation = GetActorLocation();
-	
+
 }
 
 // Called every frame
@@ -26,7 +27,7 @@ void AElevatorButton::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
+
 
 	FVector CurrentPosition = GetActorLocation();
 	FVector TargetPosition = OriginalLocation + MoveOffSet;
@@ -44,19 +45,31 @@ void AElevatorButton::Tick(float DeltaTime)
 
 void AElevatorButton::Press()
 {
-	
-	if(bHasPower && GetWorld()->GetMapName() != "Level2")
+	if (bHasPower)
 	{
-	bIsPressed = true;
-		// load next level
-	UGameplayStatics::OpenLevel(this, LevelToOpen);
+		UMyGameInstance* GameInstance = Cast<UMyGameInstance>(GetGameInstance()); //get game instance
+		if (GameInstance)
+		{
+			//save player data
+			GameInstance->SavePlayerData();
+		}
 
+		if (LevelToOpen == "Level3")
+		{
+			AProjectHALFPlayerController* controller = Cast<AProjectHALFPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+			controller->bGameWin = true;
+
+		}
+
+		if (GetWorld()->GetMapName() != "Level2")
+		{
+			bIsPressed = true;
+			// load next level
+			UGameplayStatics::OpenLevel(this, LevelToOpen);
+
+		}
+		
 	}
-	if(bHasPower && GetWorld()->GetMapName() == "Level2")
-	{
-		AProjectHALFPlayerController* controller = Cast<AProjectHALFPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-		controller->bGameWin = true;
-	
-	}
-	
+
+
 }

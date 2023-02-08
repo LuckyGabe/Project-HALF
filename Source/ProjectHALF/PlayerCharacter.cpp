@@ -48,6 +48,8 @@ void APlayerCharacter::BeginPlay()
 	if (playerController != nullptr)
 	{
 		playerController->bEnableMouseOverEvents = true; // enable mouse over events
+
+	
 	}
 
 	Health = MaxHealth;
