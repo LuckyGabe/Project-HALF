@@ -17,7 +17,7 @@ AProjectHALFPlayerController::AProjectHALFPlayerController()
 void AProjectHALFPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	FString CurrentMapName = GetWorld()->GetMapName(); //get current map name
+	CurrentMapName = GetWorld()->GetMapName(); //get current map name
 	
 	GetViewportSize(screenSizeX, ScreenSizeY);
 		
@@ -25,8 +25,8 @@ void AProjectHALFPlayerController::BeginPlay()
 	bGamePaused = false;
 
 
-	//Add HUD to the viewport
-	if (HUDClass && CurrentMapName != "MainMenu")
+	//Add HUD to the viewport. There are two different map names limited because they differ after build and in the editor
+	if (HUDClass && CurrentMapName != "MainMenu" && CurrentMapName != "UEDPIE_0_MainMenu")
 	{
 		PlayerHUD = CreateWidget<UUserWidget>(this, HUDClass);
 		
@@ -59,9 +59,9 @@ void AProjectHALFPlayerController::BeginPlay()
 void AProjectHALFPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if(bLockMouse){ SetMouseLocation(screenSizeX/2, ScreenSizeY/2); }
-
+	// Main menu map has 2 names because they differ in the editor and after building the game
+	if(bLockMouse && CurrentMapName != "MainMenu" && CurrentMapName != "UEDPIE_0_MainMenu") { SetMouseLocation(screenSizeX / 2, ScreenSizeY / 2); }
+	
 	//Pausing the game
 	if (PauseMenu)
 	{

@@ -180,8 +180,8 @@ void APlayerCharacter::Interact()
 				SpawnGun();
 
 				//set ammunition
-				MagAmmo = 12;
-				Ammo = 12;
+				MagAmmo = 16;
+				Ammo = 16;
 			}
 		}
 
@@ -195,7 +195,7 @@ void APlayerCharacter::Interact()
 				{
 					pickable->PickedUp(); //pick up the gun
 
-					Ammo += 12; //add ammunition
+					Ammo += 16; //add ammunition
 				}
 			}
 
@@ -308,11 +308,11 @@ bool APlayerCharacter::IsReloading() const
 void APlayerCharacter::Reload()
 {
 	//if player has a gun and ammunition
-	if (Gun && MagAmmo < 12 && Ammo>0)
+	if (Gun && MagAmmo < 16 && Ammo>0)
 	{
 		bIsReloading = true;
 
-		float amount = 12 - MagAmmo; //calculate the amount of bullets that will be moved to magazine
+		float amount = 16 - MagAmmo; //calculate the amount of bullets that will be moved to magazine
 
 		for (int i = 0; i < amount; i++)
 		{

@@ -45,6 +45,8 @@ private:
 	UPROPERTY()
 		class UUserWidget* Note;
 	bool bIsOpened = false;
+	UPROPERTY(EditAnywhere)
+		USoundBase* PageSound;
 	UFUNCTION()
 		void ShowPickUpMessage(UPrimitiveComponent* TouchedComponent);
 	UFUNCTION()

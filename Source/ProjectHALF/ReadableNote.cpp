@@ -52,7 +52,10 @@ void AReadableNote::OpenNote()
 		APlayerController* controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 		Note = CreateWidget<UUserWidget>(controller, NoteClass);
 		Note->AddToViewport();
-
+		if (PageSound)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), PageSound);
+		}
 		bIsOpened = true;
 	}
 	

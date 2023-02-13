@@ -47,7 +47,8 @@ private:
 
 	UPROPERTY()
 		class UUserWidget* PauseMenu;
-
+	UPROPERTY()
+		FString CurrentMapName;
 	UPROPERTY(EditDefaultsOnly)
 		TSubclassOf<class UUserWidget> GameOverClass;
 

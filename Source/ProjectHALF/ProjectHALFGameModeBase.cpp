@@ -32,13 +32,13 @@ void AProjectHALFGameModeBase::BeginPlay()
 	}
 
 		//Load player data
-	if (GameInstance && CurrentMapName != "MainMenu")
+	if (GameInstance && CurrentMapName != "MainMenu" && CurrentMapName != "UEDPIE_0_MainMenu")
 	{
 		GameInstance->LoadPlayerData();
 
 	}
-
-	if (CurrentMapName == "MainMenu")
+	// Main menu map has 2 names because they differ in the editor and after building the game
+	if (CurrentMapName == "MainMenu" && CurrentMapName != "UEDPIE_0_MainMenu")
 	{
 		PlayerController->SetShowMouseCursor(true);
 
