@@ -9,6 +9,7 @@
 /**
  *
  */
+
 UCLASS()
 class PROJECTHALF_API AProjectHALFPlayerController : public APlayerController
 {
@@ -36,6 +37,8 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+
+	//Widgets
 	UPROPERTY(EditDefaultsOnly)
 		TSubclassOf<class UUserWidget> HUDClass;
 
@@ -67,6 +70,8 @@ private:
 		class UUserWidget* PickUpMessage;
 
 	void DisplayHUD();
+
+	//Variables needed to get the center of the screen and lock the mouse there
 	int screenSizeX, ScreenSizeY;
 
 	/* Handle to manage the timer */

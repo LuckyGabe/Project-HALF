@@ -20,6 +20,7 @@ public:
 		void LoadPlayerData();
 	UFUNCTION()
 		void ClearPlayerData();
+	//Store Player data
 	float Ammo;
 	float MagAmmo;
 	int MedKitsNumb;

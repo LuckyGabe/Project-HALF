@@ -15,20 +15,6 @@ AExplosiveBarrel::AExplosiveBarrel()
 	BarrelMesh->SetupAttachment(RootComponent);
 }
 
-// Called when the game starts or when spawned
-void AExplosiveBarrel::BeginPlay()
-{
-	Super::BeginPlay();
-
-}
-
-// Called every frame
-void AExplosiveBarrel::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 float AExplosiveBarrel::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);

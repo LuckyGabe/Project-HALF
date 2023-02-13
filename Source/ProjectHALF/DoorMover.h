@@ -31,17 +31,20 @@ private:
 
 	AActor* Owner = GetOwner();
 	AActor* GetAllowedActor() const;
-	void ResetSound();
-	UPROPERTY(EditAnywhere)
-		FVector MoveOffSet;
-	float time = 0;
-	UPROPERTY(EditAnywhere)
-		FVector OriginalLocation;
-	UPROPERTY(EditAnywhere)
-		FVector BoxCheckSize = FVector(300, 400, 400);
 
 	UPROPERTY(EditAnywhere)
-		float MoveTime = 1;
+		FVector MoveOffSet; //how far and which direction should the door move  
+
+	float time = 0;
+
+	UPROPERTY(EditAnywhere)
+		FVector OriginalLocation; //start location (door closed)
+
+	UPROPERTY(EditAnywhere)
+		FVector BoxCheckSize = FVector(300, 400, 400); // size of the overlapping box (adjustable in the editor)
+
+	UPROPERTY(EditAnywhere)
+		float MoveTime = 1; // How long it take the doors to fully open
 
 };
 

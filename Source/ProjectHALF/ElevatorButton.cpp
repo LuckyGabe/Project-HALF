@@ -14,35 +14,6 @@ AElevatorButton::AElevatorButton()
 	RootComponent = ButtonMesh;
 }
 
-// Called when the game starts or when spawned
-void AElevatorButton::BeginPlay()
-{
-	Super::BeginPlay();
-	OriginalLocation = GetActorLocation();
-
-}
-
-// Called every frame
-void AElevatorButton::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-
-
-	FVector CurrentPosition = GetActorLocation();
-	FVector TargetPosition = OriginalLocation + MoveOffSet;
-	float MoveSpeed = FVector::Dist(OriginalLocation, TargetPosition) / MoveTime;
-	FVector NewLocation = FMath::VInterpConstantTo(CurrentPosition, TargetPosition, DeltaTime, MoveSpeed);
-
-	if (bIsPressed)
-	{
-		SetActorLocation(NewLocation);
-
-	}
-
-
-}
-
 void AElevatorButton::Press()
 {
 	if (bHasPower)
@@ -68,7 +39,7 @@ void AElevatorButton::Press()
 			UGameplayStatics::OpenLevel(this, LevelToOpen);
 
 		}
-		
+
 	}
 
 

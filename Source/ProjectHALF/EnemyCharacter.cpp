@@ -8,7 +8,7 @@
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent"); // create a camera
 	CameraComponent->SetupAttachment(RootComponent); //attach camera to the root component
@@ -24,11 +24,13 @@ void AEnemyCharacter::BeginPlay()
 	health = maxHealth;
 	if (gunBP != nullptr)
 	{
-		gun = GetWorld()->SpawnActor<AGun>(gunBP);
-		GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
+		gun = GetWorld()->SpawnActor<AGun>(gunBP); //spawn gun
+
+		GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None); //hide bone (It's a Wraith's gun mesh)
+		//attach newly created gun to the socket
 		gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("GunSocket"));
-		gun->SetOwner(this);
-		
+		gun->SetOwner(this); //set gun's owner
+
 	}
 	else { UE_LOG(LogTemp, Error, TEXT("Failed to get gun for the enemy")); }
 }
@@ -37,8 +39,10 @@ void AEnemyCharacter::BeginPlay()
 void AEnemyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 	if (health <= 0)
 	{
+		//if this enemy is dead disable collisions and detach AI controller
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		DetachFromControllerPendingDestroy();
 	}
@@ -54,13 +58,16 @@ void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
+
 void AEnemyCharacter::Shoot()
 {
 	gun->PullTrigger();
 }
+
+//Function to be passed to animation blueprint
 bool AEnemyCharacter::IsDead() const
 {
-	if (health <= 0) {   return true; }
+	if (health <= 0) { return true; }
 	else return false;
 }
 
@@ -69,10 +76,11 @@ float AEnemyCharacter::GetHealthPercentage() const
 	return health / maxHealth;
 }
 
+//override take damage
 float AEnemyCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
 	float damageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	damageApplied = FMath::Min(health, damageApplied);
+	damageApplied = FMath::Min(health, damageApplied); //damage applied can't be larger than health
 	health -= damageApplied;
 	if (IsDead())
 	{

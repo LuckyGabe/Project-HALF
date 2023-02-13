@@ -10,17 +10,17 @@ AProjectHALFPlayerController::AProjectHALFPlayerController()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	
+
 }
 
-	// Called when the game starts or when spawned
+// Called when the game starts or when spawned
 void AProjectHALFPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	CurrentMapName = GetWorld()->GetMapName(); //get current map name
-	
+
 	GetViewportSize(screenSizeX, ScreenSizeY);
-		
+
 	bGameOver = false;
 	bGamePaused = false;
 
@@ -29,19 +29,19 @@ void AProjectHALFPlayerController::BeginPlay()
 	if (HUDClass && CurrentMapName != "MainMenu" && CurrentMapName != "UEDPIE_0_MainMenu")
 	{
 		PlayerHUD = CreateWidget<UUserWidget>(this, HUDClass);
-		
+
 		GetWorldTimerManager().SetTimer(LoadingScreenTimerHandle, this, &AProjectHALFPlayerController::DisplayHUD, 2.f, false);
 	}
-
-	if(PickUpMessageClass)
+	//Create Widgets
+	if (PickUpMessageClass)
 	{
 		PickUpMessage = CreateWidget<UUserWidget>(this, PickUpMessageClass);
 	}
-	
+
 	if (PauseMenuClass)
 	{
 		PauseMenu = CreateWidget<UUserWidget>(this, PauseMenuClass);
-		
+
 	}
 	if (GameOverClass)
 	{
@@ -61,8 +61,8 @@ void AProjectHALFPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	// Main menu map has 2 names because they differ in the editor and after building the game
-	if(bLockMouse && CurrentMapName != "MainMenu" && CurrentMapName != "UEDPIE_0_MainMenu") { SetMouseLocation(screenSizeX / 2, ScreenSizeY / 2); }
-	
+	if (bLockMouse && CurrentMapName != "MainMenu" && CurrentMapName != "UEDPIE_0_MainMenu") { SetMouseLocation(screenSizeX / 2, ScreenSizeY / 2); }
+
 	//Pausing the game
 	if (PauseMenu)
 	{
@@ -126,7 +126,7 @@ void AProjectHALFPlayerController::Tick(float DeltaTime)
 	{
 		if (bShowPickUpMessage && !PickUpMessage->IsInViewport())
 		{
-			
+
 
 			PickUpMessage->AddToViewport(); // add game over screen to the viewport
 		}
@@ -141,5 +141,5 @@ void AProjectHALFPlayerController::Tick(float DeltaTime)
 	}
 
 }
-	
-	void AProjectHALFPlayerController::DisplayHUD() { PlayerHUD->AddToViewport(); }
+
+void AProjectHALFPlayerController::DisplayHUD() { PlayerHUD->AddToViewport(); }

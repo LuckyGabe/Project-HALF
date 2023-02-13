@@ -1,5 +1,3 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 
 #include "ProjectHALFGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
@@ -71,13 +69,6 @@ void AProjectHALFGameModeBase::BeginPlay()
 		UGameplayStatics::PlaySound2D(GetWorld(), Level2StartEffects);
 	}
 
-
-}
-
-// Called every frame
-void AProjectHALFGameModeBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
 }
 

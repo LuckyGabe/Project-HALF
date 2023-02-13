@@ -35,7 +35,7 @@ void UDoorMover::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	FVector CurrentPosition = GetOwner()->GetActorLocation();
 	FVector TargetPosition = OriginalLocation + MoveOffSet;
 	time += DeltaTime;
-	if (time == 0.3f) //timer to execute tracing every 0.3s for optimisation
+	if (time > 0.3f) //timer to execute tracing every 0.3s for optimisation
 	{
 		if (GetAllowedActor() != nullptr) // if tracing found a player
 		{
@@ -55,6 +55,7 @@ void UDoorMover::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 	if (bShouldMove)
 	{
+		//Move actor 
 		GetOwner()->SetActorLocation(NewLocation);
 	}
 	else
@@ -76,7 +77,8 @@ AActor* UDoorMover::GetAllowedActor() const
 	UClass* seekClass = NULL;
 	FVector ActorCenter;
 	FVector ActorSize;
-	GetOwner()->GetActorBounds(true, ActorCenter, ActorSize);
+	GetOwner()->GetActorBounds(true, ActorCenter, ActorSize); //get actor center
+	//box overlap 
 	UKismetSystemLibrary::BoxOverlapActors(GetWorld(), ActorCenter, BoxCheckSize, TraceObjectTypes, NULL, IgnoreActors, OverlappingActors);
 
 	for (AActor* actor : OverlappingActors)

@@ -1,14 +1,9 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "ProjectHALFGameModeBase.generated.h"
-
-/**
- * 
- */
 
 UCLASS()
 
@@ -18,8 +13,6 @@ class PROJECTHALF_API AProjectHALFGameModeBase : public AGameModeBase
 
 public:
 	AProjectHALFGameModeBase();
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable)
 		void AddLoadingScreenToViewport();

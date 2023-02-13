@@ -14,17 +14,6 @@ UGrabber::UGrabber()
 	// ...
 }
 
-
-// Called when the game starts
-void UGrabber::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// ...
-
-}
-
-
 // Called every frame
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -50,7 +39,7 @@ void UGrabber::Grab()
 		physicsHandle->GrabComponentAtLocationWithRotation(hitResult.GetComponent(), NAME_None, hitResult.ImpactPoint, GetComponentRotation());
 	}
 }
-	//sphere trace objects ahead
+//sphere trace objects ahead
 bool UGrabber::GetGrabbableInReach(FHitResult& outHitResult) const
 {
 	FVector startVector = GetComponentLocation();

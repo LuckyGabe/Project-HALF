@@ -26,7 +26,7 @@ void AReadableNote::BeginPlay()
 	PlayerController = Cast<AProjectHALFPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	NoteMesh->SetWorldLocation(RootComponent->GetComponentLocation());
 	NoteMesh->OnBeginCursorOver.AddDynamic(this, &AReadableNote::ShowPickUpMessage);
-	Note = CreateWidget<UUserWidget>(controller, NoteClass);
+	Note = CreateWidget<UUserWidget>(PlayerController, NoteClass);
 
 }
 

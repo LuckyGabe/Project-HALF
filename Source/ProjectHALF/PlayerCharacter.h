@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -18,10 +17,11 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 
-//Protected Functions
+	//Protected Functions
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
 private:
 	void MoveForward(float scale); //Move forward/backward
 	void MoveRight(float scale); // Move left/right
@@ -30,14 +30,15 @@ private:
 	void StartCrouch();
 	void StopCrouch();
 	bool RayTrace(FHitResult& OutHit, FVector& ShotDirection); // bool if raytracing was succesfull and return the results
-	void Interact();
+	void Interact(); //interact with items
 	void Shoot();
 	void Reload();
 	void ResetReload();
-	void Heal();
-	int MedKitsNumb;
+	void Heal(); //heal the player 
 
-public:	
+	int MedKitsNumb; //number of healing items
+
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -45,16 +46,17 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+	//Saving & Loading player's data
+	UFUNCTION(BlueprintCallable)
+		void SavePlayerData(float& OutHealth, float& OutAmmo, float& OutMagAmmo, int& OutMedKitsNumb, bool& bPlayerHasGun);
 
 	UFUNCTION(BlueprintCallable)
-	void SavePlayerData(float& OutHealth, float& OutAmmo, float& OutMagAmmo,int& OutMedKitsNumb, bool & bPlayerHasGun);
+		void LoadPlayerData(float NewHealth, float NewAmmo, float NewMagAmmo, int NewMedKitsNumb, bool bPlayerHasGun);
 
-	UFUNCTION(BlueprintCallable)
-		void LoadPlayerData(float NewHealth, float NewAmmo, float NewMagAmmo,int NewMedKitsNumb, bool bPlayerHasGun);
 
 	UFUNCTION()
 		void SpawnGun();
-	//These function are for the UI
+	//These function are for the UI and blueprint callable
 	UFUNCTION(BlueprintPure)
 		bool IsReloading() const;
 
@@ -74,32 +76,34 @@ public:
 		float GetAmmunition() const;
 
 	UFUNCTION(BlueprintPure)
-	int GetMedKitsNumb() const;
+		int GetMedKitsNumb() const;
 
 	UFUNCTION(BlueprintCallable)
-	void PauseGame();
+		void PauseGame();
 
-//Protected variables & components
+	//Protected variables & components
 protected:
 	UPROPERTY(VisibleAnywhere)
-	UCameraComponent* CameraComponent;
+		UCameraComponent* CameraComponent;
 
 	UPROPERTY(VisibleAnywhere)
-	USkeletalMeshComponent* SkeletalMesh;
+		USkeletalMeshComponent* SkeletalMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-	float TurnRate;
+		float TurnRate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 		float LookUpRate;
+
+	//How far should the race trace for interaction reach
 	UPROPERTY(EditAnywhere, Category = "Interaction")
-	float RayTraceRange;
+		float RayTraceRange;
 
 	UPROPERTY(EditDefaultsOnly)
 		TSubclassOf< AGun> GunBP;
-
 	UPROPERTY()
 		AGun* Gun;
+
 	UPROPERTY(EditDefaultsOnly)
 		float MaxHealth = 100;
 	UPROPERTY(EditDefaultsOnly)
@@ -123,7 +127,6 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 		USoundBase* ReloadingSound;
-
 
 	UPROPERTY(EditAnywhere)
 		USoundBase* DeathSound;

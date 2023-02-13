@@ -14,7 +14,6 @@
 #include "ElevatorButton.h"
 #include "ProjectHALFPlayerController.h"
 
-
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
@@ -47,8 +46,6 @@ void APlayerCharacter::BeginPlay()
 	if (playerController != nullptr)
 	{
 		playerController->bEnableMouseOverEvents = true; // enable mouse over events
-
-	
 	}
 
 	Health = MaxHealth;
@@ -178,7 +175,7 @@ void APlayerCharacter::Interact()
 				SpawnGun(); //Spawn the gun in player's hands
 				//set ammunition
 				MagAmmo = 16;
-				Ammo = 24;
+				Ammo = 20;
 			}
 		}
 
@@ -383,7 +380,7 @@ void APlayerCharacter::Heal()
 	if (MedKitsNumb > 0)
 	{
 		MedKitsNumb--;
-		Health += 40;
+		Health = FMath::Clamp(Health + 40, 0.f, (float)MaxHealth); //clamp the health so it wouldn't exceed max health
 
 	}
 

@@ -31,6 +31,7 @@ void APickable::PickedUp()
 {
 	bActive = false;
 	SetActorHiddenInGame(true); //hide this actor
+
 }
 
 bool APickable::GetActive()

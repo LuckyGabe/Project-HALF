@@ -18,19 +18,7 @@ AGun::AGun()
 	GunMesh->SetupAttachment(root);
 }
 
-// Called when the game starts or when spawned
-void AGun::BeginPlay()
-{
-	Super::BeginPlay();
 
-}
-
-// Called every frame
-void AGun::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
 
 bool AGun::GunTrace(FHitResult& OutHit, FVector& ShotDirection)
 {
