@@ -51,35 +51,32 @@ void AExplosiveBarrel::Explode()
 		const FVector Start = GetActorLocation();
 		const FVector End = GetActorLocation();
 		TArray<AActor*> IgnoredActors;
-		IgnoredActors.Add(this);
-		TArray<FHitResult> HitResultArray;
-		
-
+		IgnoredActors.Add(this); //add this object to the ignored actors
+		TArray<FHitResult> HitResultArray; //store hit actors
 		if (Explosion != nullptr)
 		{
+			//spawn explosion (particle effect)
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Explosion, GetActorLocation());
-		
 		}
-
+		//sphere trace to get all the actors around
 		bool Hit = UKismetSystemLibrary::SphereTraceMulti(
 			GetWorld(), Start, End, ExplosionRadius,
 			UEngineTypes::ConvertToTraceType(ECC_Camera), false, IgnoredActors, EDrawDebugTrace::None,
 			HitResultArray, true);
-
 		if (Hit)
 		{
-			for (int i = 0; i < HitResultArray.Num(); i++)
+			for (int i = 0; i < HitResultArray.Num(); i++) //iterate through all found actors
 			{
 				FPointDamageEvent DamageEvent(Damage, HitResultArray[i], GetActorLocation(), nullptr);
+				//store found actor
 				AActor* ActorInRange = HitResultArray[i].GetActor();
-
 				if (ActorInRange != nullptr)
 				{
+					//deal damage to the actor
 					ActorInRange->TakeDamage(Damage, DamageEvent, NULL, this);
 				}
-
 			}
 		}
-		SetLifeSpan(0.2f);
+		SetLifeSpan(0.2f); //destroy this object after 0.2s
 	}
 }

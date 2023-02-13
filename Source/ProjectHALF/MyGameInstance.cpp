@@ -24,5 +24,4 @@ void UMyGameInstance::ClearPlayerData()
 	MedKitsNumb = 0;
 	bHasGun = 0;
 	Health = 100;
-
 }

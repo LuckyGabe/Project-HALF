@@ -15,32 +15,25 @@ void UTriggerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if(GetAllowedActor()!= nullptr)
+	if (GetAllowedActor() != nullptr)
 	{
-
-		EnableElevator();
-		GetAllowedActor()->SetActorLocation(GetComponentLocation() - FVector(0,0,15));
+		EnableElevator(); //cast to button and enable power
+		//Set key's location and rotation to fit to the power socket and lock it
+		GetAllowedActor()->SetActorLocation(GetComponentLocation() - FVector(0, 0, 15));
 		GetAllowedActor()->SetActorRotation(FRotator(0, 0, 0));
 		GetAllowedActor()->DisableComponentsSimulatePhysics();
 	}
-	
-
 }
-
 
 AActor* UTriggerComponent::GetAllowedActor() const
 {
-
 	TArray<AActor*> overlappingActors;
 	GetOverlappingActors(overlappingActors);
-	for(AActor* actor : overlappingActors)
+	for (AActor* actor : overlappingActors)
 	{
-	
-		if(actor->ActorHasTag("Key"))
+		if (actor->ActorHasTag("Key"))
 		{
-			
 			return actor;
-		
 		}
 	}
 	return nullptr;
@@ -48,13 +41,10 @@ AActor* UTriggerComponent::GetAllowedActor() const
 
 void UTriggerComponent::EnableElevator()
 {
-
 	AElevatorButton* button = Cast<AElevatorButton>(GetOwner());
-	
-					if (button != nullptr)
-					{
-						button->bHasPower = true;
-					}
 
-
+	if (button != nullptr)
+	{
+		button->bHasPower = true;
+	}
 }

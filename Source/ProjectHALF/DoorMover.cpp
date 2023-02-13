@@ -13,7 +13,7 @@ UDoorMover::UDoorMover()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-	
+
 }
 
 
@@ -23,8 +23,7 @@ void UDoorMover::BeginPlay()
 	Super::BeginPlay();
 
 	OriginalLocation = GetOwner()->GetActorLocation();
-	
-	
+
 }
 
 
@@ -32,44 +31,36 @@ void UDoorMover::BeginPlay()
 void UDoorMover::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-
-// For moving the door
+	// For moving the door
 	FVector CurrentPosition = GetOwner()->GetActorLocation();
 	FVector TargetPosition = OriginalLocation + MoveOffSet;
-
-	if(GetAllowedActor() != nullptr)
+	time += DeltaTime;
+	if (time == 0.3f) //timer to execute tracing every 0.3s for optimisation
 	{
-		bShouldMove = true;
+		if (GetAllowedActor() != nullptr) // if tracing found a player
+		{
+			bShouldMove = true;
+		}
+		else
+		{
+			bShouldMove = false;
 
+		}
 	}
-
-	else 
-	{
-		bShouldMove = false;
-
-	}
-
-	
 	float MoveSpeed = FVector::Dist(OriginalLocation, TargetPosition) / MoveTime;
-
+	//start location (door closed)
 	FVector DefaultLocation = FMath::VInterpConstantTo(CurrentPosition, OriginalLocation, DeltaTime, MoveSpeed);
+	// New location (door fully open)
 	FVector NewLocation = FMath::VInterpConstantTo(CurrentPosition, TargetPosition, DeltaTime, MoveSpeed);
 
 	if (bShouldMove)
 	{
-
 		GetOwner()->SetActorLocation(NewLocation);
-	
 	}
-
 	else
 	{
 		GetOwner()->SetActorLocation(DefaultLocation);
-
-		
 	}
-
 }
 
 AActor* UDoorMover::GetAllowedActor() const
@@ -86,21 +77,19 @@ AActor* UDoorMover::GetAllowedActor() const
 	FVector ActorCenter;
 	FVector ActorSize;
 	GetOwner()->GetActorBounds(true, ActorCenter, ActorSize);
+	UKismetSystemLibrary::BoxOverlapActors(GetWorld(), ActorCenter, BoxCheckSize, TraceObjectTypes, NULL, IgnoreActors, OverlappingActors);
 
-
-		UKismetSystemLibrary::BoxOverlapActors(GetWorld(), ActorCenter, BoxCheckSize, TraceObjectTypes, NULL, IgnoreActors, OverlappingActors);
-		
-		for (AActor* actor : OverlappingActors)
+	for (AActor* actor : OverlappingActors)
+	{
+		if (actor->ActorHasTag("Player") || actor->ActorHasTag("Enemy"))
 		{
-			if (actor->ActorHasTag("Player") || actor->ActorHasTag("Enemy"))
-			{
-				
-				return actor;
-			}
 
+			return actor;
 		}
 
-		return nullptr;
+	}
+
+	return nullptr;
 
 }
 

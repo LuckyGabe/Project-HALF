@@ -47,11 +47,12 @@ bool AGun::GunTrace(FHitResult& OutHit, FVector& ShotDirection)
 
 	FVector endPoint = location + rotation.Vector() * bulletRange; //calculate the end point of the trace
 	FCollisionQueryParams params;
+	//Add gun and the player (owner) to the ignored actors list
 	params.AddIgnoredActor(this);
 	params.AddIgnoredActor(GetOwner());
-
+	//out shot direction
 	ShotDirection = -rotation.Vector();
-
+	//ray trace
 	return  GetWorld()->LineTraceSingleByChannel(OutHit, location, endPoint, ECollisionChannel::ECC_GameTraceChannel3, params);
 }
 
@@ -77,7 +78,8 @@ void AGun::PullTrigger()
 
 	FVector shotDirection; //store shot direction
 	AController* ownerController = GetOwnerController();
-	FHitResult hitResult;
+	FHitResult hitResult; //store hit result
+
 	bool bSuccess = GunTrace(hitResult, shotDirection);
 
 	if (bSuccess)
@@ -85,7 +87,6 @@ void AGun::PullTrigger()
 		if (ImpactEffect != nullptr)
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, hitResult.Location, shotDirection.Rotation(), true);
-			
 		}
 		if(ImpactSound != nullptr)
 		{
@@ -94,19 +95,16 @@ void AGun::PullTrigger()
 		if(hitResult.Actor->ActorHasTag("Glass") && GlassBreakingSound)
 		{
 			UGameplayStatics::PlaySoundAtLocation(GetWorld(), GlassBreakingSound, hitResult.Location);
-
 		}
-
-
+		//Create damage event
 		FPointDamageEvent DamageEvent(damage, hitResult, shotDirection, nullptr);
+		//store actor that got hit
 		AActor* hitActor = hitResult.GetActor();
 		if (hitActor != nullptr)
 		{
-
+			//take damage 
 			hitActor->TakeDamage(damage, DamageEvent, ownerController, this);
-
 		}
-
 	}
 
 }

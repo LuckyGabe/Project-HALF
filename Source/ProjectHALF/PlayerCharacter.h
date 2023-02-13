@@ -51,23 +51,31 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void LoadPlayerData(float NewHealth, float NewAmmo, float NewMagAmmo,int NewMedKitsNumb, bool bPlayerHasGun);
+
 	UFUNCTION()
 		void SpawnGun();
 	//These function are for the UI
 	UFUNCTION(BlueprintPure)
 		bool IsReloading() const;
+
 	UFUNCTION(BlueprintPure)
 		float GetHealthPercent() const;
+
 	UFUNCTION(BlueprintPure)
 		FString GetHealthText() const;
+
 	UPROPERTY(BlueprintReadWrite)
 		bool bHasGun = false;
+
 	UFUNCTION(BlueprintPure)
 		float GetMagAmmunition() const;
+
 	UFUNCTION(BlueprintPure)
 		float GetAmmunition() const;
+
 	UFUNCTION(BlueprintPure)
 	int GetMedKitsNumb() const;
+
 	UFUNCTION(BlueprintCallable)
 	void PauseGame();
 

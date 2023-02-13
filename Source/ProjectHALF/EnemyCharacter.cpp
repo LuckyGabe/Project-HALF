@@ -78,8 +78,6 @@ float AEnemyCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const&
 	{
 		DetachFromControllerPendingDestroy();
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Health left: %f"), health);
 	return damageApplied;
 
 }

@@ -21,7 +21,7 @@ void UGrabber::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+
 }
 
 
@@ -31,56 +31,42 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	UPhysicsHandleComponent* physicsHandle = GetPhysicsHandle();
+	//the start and end (lenght) of a vector for grabbing 
 	FVector startVector = GetComponentLocation();
 	FVector endVector = startVector + GetForwardVector() * grabDistance;
-	
-		physicsHandle->SetTargetLocationAndRotation(endVector, GetComponentRotation());
-	
-}
 
+	physicsHandle->SetTargetLocationAndRotation(endVector, GetComponentRotation());
+
+}
 void UGrabber::Grab()
 {
 	UPhysicsHandleComponent* physicsHandle = GetPhysicsHandle();
-
 	FHitResult hitResult;
 
 	if (GetGrabbableInReach(hitResult)) {
-
+		//enable rigidbodies in grabbed object
 		hitResult.GetComponent()->WakeAllRigidBodies();
-		FString hitActorName = hitResult.GetActor()->GetName();
-		
-
 		//grab
 		physicsHandle->GrabComponentAtLocationWithRotation(hitResult.GetComponent(), NAME_None, hitResult.ImpactPoint, GetComponentRotation());
-
-
 	}
-
 }
-
+	//sphere trace objects ahead
 bool UGrabber::GetGrabbableInReach(FHitResult& outHitResult) const
 {
 	FVector startVector = GetComponentLocation();
 	FVector endVector = startVector + GetForwardVector() * grabDistance;
 	FCollisionShape sphere = FCollisionShape::MakeSphere(grabRadius);
-
-	//DrawDebugLine(GetWorld(), startVector, endVector, FColor::Red, false, 10.f);
-	
-
 	return GetWorld()->SweepSingleByChannel(outHitResult, startVector, endVector, FQuat::Identity, ECC_GameTraceChannel2, sphere);;
 }
-
 void UGrabber::Release()
 {
 	UPhysicsHandleComponent* physicsHandle = GetPhysicsHandle();
 	if (physicsHandle->GetGrabbedComponent() != nullptr) {
 		physicsHandle->ReleaseComponent();
 	}
-
 }
 
 UPhysicsHandleComponent* UGrabber::GetPhysicsHandle() const
 {
 	return GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
-
 }

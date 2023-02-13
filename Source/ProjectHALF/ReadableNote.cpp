@@ -10,8 +10,7 @@ AReadableNote::AReadableNote()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	//BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
-	//RootComponent = BoxComponent;
+
 	root = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	SetRootComponent(root);
 	NoteMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
@@ -27,7 +26,7 @@ void AReadableNote::BeginPlay()
 	PlayerController = Cast<AProjectHALFPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	NoteMesh->SetWorldLocation(RootComponent->GetComponentLocation());
 	NoteMesh->OnBeginCursorOver.AddDynamic(this, &AReadableNote::ShowPickUpMessage);
-
+	Note = CreateWidget<UUserWidget>(controller, NoteClass);
 
 }
 
@@ -49,12 +48,12 @@ void AReadableNote::OpenNote()
 
 	if (NoteClass)
 	{
+		//Get player controller
 		APlayerController* controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-		Note = CreateWidget<UUserWidget>(controller, NoteClass);
-		Note->AddToViewport();
+		Note->AddToViewport(); //add to the viewport
 		if (PageSound)
 		{
-			UGameplayStatics::PlaySound2D(GetWorld(), PageSound);
+			UGameplayStatics::PlaySound2D(GetWorld(), PageSound); //Play sound
 		}
 		bIsOpened = true;
 	}
@@ -65,12 +64,10 @@ void AReadableNote::CloseNote()
 {
 	if (Note)
 	{
-	
-		Note->RemoveFromViewport();
+		Note->RemoveFromViewport(); //remove from the viewport
 		bIsOpened = false;
 		player = NULL;
 	}
-
 }
 
 bool AReadableNote::IsOpened() { return bIsOpened; }

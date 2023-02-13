@@ -34,7 +34,7 @@ private:
 	void ResetSound();
 	UPROPERTY(EditAnywhere)
 		FVector MoveOffSet;
-
+	float time = 0;
 	UPROPERTY(EditAnywhere)
 		FVector OriginalLocation;
 	UPROPERTY(EditAnywhere)

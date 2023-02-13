@@ -11,7 +11,6 @@
 #include "Gun.h"
 #include "DrawDebugHelpers.h"
 #include "ReadableNote.h"
-#include "Keypad.h"
 #include "ElevatorButton.h"
 #include "ProjectHALFPlayerController.h"
 
@@ -176,12 +175,10 @@ void APlayerCharacter::Interact()
 			{
 				bHasGun = true;
 				pickable->PickedUp(); //pick up the gun
-
-				SpawnGun();
-
+				SpawnGun(); //Spawn the gun in player's hands
 				//set ammunition
 				MagAmmo = 16;
-				Ammo = 16;
+				Ammo = 24;
 			}
 		}
 
@@ -198,8 +195,6 @@ void APlayerCharacter::Interact()
 					Ammo += 16; //add ammunition
 				}
 			}
-
-
 		}
 
 		//If picking up Health kit
@@ -245,20 +240,6 @@ void APlayerCharacter::Interact()
 
 			}
 		}
-
-
-		//else if (hitActor != nullptr && hitActor->GetRootComponent()->ComponentHasTag(FName("Keypad"))) 
-		//{
-
-		//	AKeypad* keypad = Cast<AKeypad>(hitActor);
-		//	if (keypad && !keypad->IsOpened())
-		//	{
-		//		keypad->OpenKeypad();
-		//		keypad->PlayerPos = GetActorLocation();
-		//		keypad->player = Cast<APawn>(this);
-		//	}
-		//}
-
 
 	}
 
@@ -311,7 +292,6 @@ void APlayerCharacter::Reload()
 	if (Gun && MagAmmo < 16 && Ammo>0)
 	{
 		bIsReloading = true;
-
 		float amount = 16 - MagAmmo; //calculate the amount of bullets that will be moved to magazine
 
 		for (int i = 0; i < amount; i++)
@@ -323,16 +303,11 @@ void APlayerCharacter::Reload()
 
 				if (Ammo < 0) { Ammo = 0; }
 			}
-
-
 		}
-
 		//reset reloading boolean
 		GetWorldTimerManager().SetTimer(ReloadingHandle, this, &APlayerCharacter::ResetReload, ReloadTime, false);
 
 	}
-
-
 }
 
 void APlayerCharacter::ResetReload()
@@ -426,8 +401,5 @@ void APlayerCharacter::PauseGame()
 		{
 			controller->bGamePaused = true;
 		}
-
 	}
-
-
 }
