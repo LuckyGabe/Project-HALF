@@ -32,6 +32,7 @@ void AProjectHALFPlayerController::BeginPlay()
 		
 		GetWorldTimerManager().SetTimer(LoadingScreenTimerHandle, this, &AProjectHALFPlayerController::DisplayHUD, 2.f, false);
 	}
+
 	if(PickUpMessageClass)
 	{
 		PickUpMessage = CreateWidget<UUserWidget>(this, PickUpMessageClass);

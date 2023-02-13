@@ -41,7 +41,9 @@ private:
 	FString CurrentMapName;
 	UPROPERTY()
 		class UUserWidget* LoadingScreen;
+
 	/* Handle to manage the timer */
 	FTimerHandle LoadingScreenTimerHandle;
+
 	void RemoveLoadingScreen();
 };

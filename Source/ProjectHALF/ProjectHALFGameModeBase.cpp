@@ -38,7 +38,7 @@ void AProjectHALFGameModeBase::BeginPlay()
 
 	}
 	// Main menu map has 2 names because they differ in the editor and after building the game
-	if (CurrentMapName == "MainMenu" && CurrentMapName != "UEDPIE_0_MainMenu")
+	if (CurrentMapName == "MainMenu" || CurrentMapName == "UEDPIE_0_MainMenu")
 	{
 		PlayerController->SetShowMouseCursor(true);
 
@@ -78,7 +78,6 @@ void AProjectHALFGameModeBase::BeginPlay()
 void AProjectHALFGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
 
 }
 
