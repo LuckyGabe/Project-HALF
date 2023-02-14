@@ -41,7 +41,7 @@ void UDoorMover::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 		{
 			bShouldMove = true;
 		}
-		else
+		else if(!bLockedOpen)
 		{
 			bShouldMove = false;
 

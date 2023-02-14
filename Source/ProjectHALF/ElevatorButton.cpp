@@ -12,8 +12,17 @@ AElevatorButton::AElevatorButton()
 	PrimaryActorTick.bCanEverTick = true;
 	ButtonMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	RootComponent = ButtonMesh;
+	PlateMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlateMesh"));
 }
-
+// Called when the game starts or when spawned
+void AElevatorButton::BeginPlay()
+{
+	Super::BeginPlay();
+	if (PlateMesh)
+	{
+		PlateMesh->SetHiddenInGame(true);
+	}
+}
 void AElevatorButton::Press()
 {
 	if (bHasPower)
@@ -25,14 +34,7 @@ void AElevatorButton::Press()
 			GameInstance->SavePlayerData();
 		}
 
-		if (LevelToOpen == "Level3")
-		{
-			AProjectHALFPlayerController* controller = Cast<AProjectHALFPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-			controller->bGameWin = true;
-
-		}
-
-		if (GetWorld()->GetMapName() != "Level2")
+		if (GetWorld()->GetMapName() != "Level3")
 		{
 			bIsPressed = true;
 			// load next level

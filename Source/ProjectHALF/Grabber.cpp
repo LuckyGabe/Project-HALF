@@ -50,7 +50,8 @@ bool UGrabber::GetGrabbableInReach(FHitResult& outHitResult) const
 void UGrabber::Release()
 {
 	UPhysicsHandleComponent* physicsHandle = GetPhysicsHandle();
-	if (physicsHandle->GetGrabbedComponent() != nullptr) {
+	if (physicsHandle->GetGrabbedComponent() != nullptr) 
+	{
 		physicsHandle->ReleaseComponent();
 	}
 }

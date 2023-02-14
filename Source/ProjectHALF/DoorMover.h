@@ -6,7 +6,6 @@
 #include "Components/ActorComponent.h"
 #include "DoorMover.generated.h"
 
-class UBoxComponent;
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PROJECTHALF_API UDoorMover : public UActorComponent
 {
@@ -26,7 +25,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 		bool bShouldMove = false;
-
+	bool bLockedOpen = false;
 private:
 
 	AActor* Owner = GetOwner();

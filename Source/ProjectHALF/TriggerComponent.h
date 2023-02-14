@@ -20,9 +20,15 @@ public:
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
+		UPROPERTY(EditAnywhere)
+		bool bForGameEnd = false; //Check true in level 3 to finish game
 private:
-	
+
+	bool IsOverlappingPlayer();
+	void EndGame();
+
+
+
 	AActor* GetAllowedActor() const;
 	void EnableElevator();
 };

@@ -42,9 +42,11 @@ public:
 private:
 	UPROPERTY(EditDefaultsOnly)
 		TSubclassOf< AGun> gunBP;
-
-	UPROPERTY(EditDefaultsOnly)
+	void OpenGate(); // opens gate on level 3
+	UPROPERTY(EditAnywhere)
 		float maxHealth = 100;
+	UPROPERTY(EditAnywhere)
+		bool IsBoss = false;
 
 	UPROPERTY(VisibleAnywhere)
 		float health;

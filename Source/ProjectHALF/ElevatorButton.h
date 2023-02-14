@@ -14,7 +14,9 @@ class PROJECTHALF_API AElevatorButton : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AElevatorButton();
-
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
 
 public:	
@@ -23,7 +25,8 @@ public:
 	void Press();
 UPROPERTY(EditAnywhere)
 	bool bHasPower = true;
-
+UPROPERTY(VisibleAnywhere)
+		UStaticMeshComponent* PlateMesh;
 private:
 	UPROPERTY(EditAnywhere)
 		FVector MoveOffSet;
@@ -34,6 +37,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 		UStaticMeshComponent* ButtonMesh;
+	
 	UPROPERTY(EditAnywhere)
 		FName LevelToOpen;
 };

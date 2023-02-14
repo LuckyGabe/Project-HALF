@@ -3,7 +3,10 @@
 
 #include "EnemyCharacter.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
+
 #include "Components/CapsuleComponent.h"
+#include "DoorMover.h"
 #include "Gun.h"
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
@@ -84,8 +87,35 @@ float AEnemyCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const&
 	health -= damageApplied;
 	if (IsDead())
 	{
+		if (IsBoss)
+		{
+			OpenGate();
+			IsBoss = false;
+		}
 		DetachFromControllerPendingDestroy();
+		
+
 	}
 	return damageApplied;
+}
 
+void AEnemyCharacter::OpenGate() //Opening gate at level 3
+{
+	FName doorTag = "Door";
+	TArray<AActor*> doors;
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), doorTag, doors);
+	
+		for(int i = 0; i < doors.Num(); i++)
+		{
+			if (doors[i])
+			{
+				UDoorMover* door = Cast<UDoorMover>(doors[i]->FindComponentByClass<UDoorMover>());
+				if (door)
+				{
+					door->bLockedOpen = true;
+					door->bShouldMove = true;
+				}
+			}
+		}
+	
 }
