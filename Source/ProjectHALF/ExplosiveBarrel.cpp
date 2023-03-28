@@ -1,16 +1,11 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "ExplosiveBarrel.h"
+﻿#include "ExplosiveBarrel.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-// Sets default values
 AExplosiveBarrel::AExplosiveBarrel()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-	
+	PrimaryActorTick.bCanEverTick = false;
+
 	BarrelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BarrelMesh"));
 	BarrelMesh->SetupAttachment(RootComponent);
 }
@@ -26,43 +21,47 @@ float AExplosiveBarrel::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 void AExplosiveBarrel::Explode()
 {
-	if (!bExploded)
+	if (bExploded) { return; }
+	bExploded = true;
+
+	if (ExplosionSound)
 	{
-		if (ExplosionSound)
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ExplosionSound, GetActorLocation());
+	}
+
+	//the start and end location of trace can be the same since the radius of the sphere trace is used
+	const FVector Start = GetActorLocation();
+	const FVector End = GetActorLocation();
+
+	TArray<AActor*> IgnoredActors = { this };
+	TArray<FHitResult> HitResultArray;
+
+	if (Explosion != nullptr)
+	{
+		//spawn explosion (particle effect)
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Explosion, GetActorLocation());
+	}
+
+	//sphere trace to get all the actors around
+	bool bHit = UKismetSystemLibrary::SphereTraceMulti(
+		GetWorld(), Start, End, ExplosionRadius,
+		UEngineTypes::ConvertToTraceType(ECC_Camera), false, IgnoredActors, EDrawDebugTrace::None,
+		HitResultArray, true);
+
+	if (bHit)
+	{
+		for (auto& HitResult : HitResultArray)
 		{
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), ExplosionSound, GetActorLocation());
-		}
-		bExploded = true;
-		//the start and end location of trace can be the same since the radius of the sphere trace is used
-		const FVector Start = GetActorLocation();
-		const FVector End = GetActorLocation();
-		TArray<AActor*> IgnoredActors;
-		IgnoredActors.Add(this); //add this object to the ignored actors
-		TArray<FHitResult> HitResultArray; //store hit actors
-		if (Explosion != nullptr)
-		{
-			//spawn explosion (particle effect)
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Explosion, GetActorLocation());
-		}
-		//sphere trace to get all the actors around
-		bool Hit = UKismetSystemLibrary::SphereTraceMulti(
-			GetWorld(), Start, End, ExplosionRadius,
-			UEngineTypes::ConvertToTraceType(ECC_Camera), false, IgnoredActors, EDrawDebugTrace::None,
-			HitResultArray, true);
-		if (Hit)
-		{
-			for (int i = 0; i < HitResultArray.Num(); i++) //iterate through all found actors
+			//store found actor
+			AActor* ActorInRange = HitResult.GetActor();
+			if (ActorInRange != nullptr)
 			{
-				FPointDamageEvent DamageEvent(Damage, HitResultArray[i], GetActorLocation(), nullptr);
-				//store found actor
-				AActor* ActorInRange = HitResultArray[i].GetActor();
-				if (ActorInRange != nullptr)
-				{
-					//deal damage to the actor
-					ActorInRange->TakeDamage(Damage, DamageEvent, NULL, this);
-				}
+				//deal damage to the actor
+				FPointDamageEvent DamageEvent(Damage, HitResult, GetActorLocation(), nullptr);
+				ActorInRange->TakeDamage(Damage, DamageEvent, NULL, this);
 			}
 		}
-		SetLifeSpan(0.2f); //destroy this object after 0.2s
 	}
+
+	SetLifeSpan(0.2f); //destroy this object after 0.2s
 }

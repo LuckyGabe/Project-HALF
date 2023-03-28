@@ -20,10 +20,6 @@ public:
 	void CloseKeypad();
 	bool IsOpened();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -31,7 +27,7 @@ public:
 private:
 	UPROPERTY(VisibleAnywhere)
 		USceneComponent* root;
-
+	bool IsOpened() const;
 	class UBoxComponent* BoxComponent;
 
 	UPROPERTY(VisibleDefaultsOnly)

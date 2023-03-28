@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "PlayerCharacter.h"
 #include "Components/CapsuleComponent.h"
@@ -125,139 +123,105 @@ void APlayerCharacter::StopCrouch()
 
 void APlayerCharacter::Shoot()
 {
-	//only shoot if player has a gun and ammunition in the magazine
 	if (Gun && Gun->bGunActive && !bIsReloading && MagAmmo > 0)
 	{
 		MagAmmo--;
-
-		//call gun's function
 		Gun->PullTrigger();
 	}
 }
 
 bool APlayerCharacter::RayTrace(FHitResult& OutHit, FVector& ShotDirection)
 {
+	 FVector Location;										  //
+	 FRotator Rotation;										 // Get the location and rotation of player viewpoint
+	GetController()->GetPlayerViewPoint(Location, Rotation);//
 
-	FVector location;										  //
-	FRotator rotation;										 // Get the location and rotation of player viewpoint
-	GetController()->GetPlayerViewPoint(location, rotation);//
+	const FVector EndPoint = Location + Rotation.Vector() * RayTraceRange; //the end point of the ray
 
-	FVector endPoint = location + rotation.Vector() * RayTraceRange; //the end point of the ray
-	FCollisionQueryParams params;
-	params.AddIgnoredActor(this); // ignore the player's collider
-	params.AddIgnoredActor(GetOwner()); // ignore the player's collider
-	ShotDirection = -rotation.Vector(); // shot the ray where the player's looking
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	Params.AddIgnoredActor(GetOwner());
 
-	//return the ray trace results
-	return  GetWorld()->LineTraceSingleByChannel(OutHit, location, endPoint, ECollisionChannel::ECC_GameTraceChannel1, params);
+	ShotDirection = -Rotation.Vector();
+
+	return GetWorld()->LineTraceSingleByChannel(OutHit, Location, EndPoint, ECollisionChannel::ECC_GameTraceChannel1, Params);
 }
 
 void APlayerCharacter::Interact()
 {
 	//store trace results
-	FVector shotDirection;
-	FHitResult hitResult;
-	bool bSuccess = RayTrace(hitResult, shotDirection);
+	FHitResult HitResult;
+	FVector ShotDirection;
 
-	if (bSuccess)
+	if (!RayTrace(HitResult, ShotDirection)) { UE_LOG(LogTemp, Warning, TEXT("Nothing Found"));  return; }
+	if (!HitResult.GetActor()) return;
+	if(RayTrace(HitResult, ShotDirection)){ UE_LOG(LogTemp, Warning, TEXT("Object hit")); }
+
+
+	if (HitResult.GetActor()->GetRootComponent()->ComponentHasTag(FName("Gun")))
 	{
+		APickable* Pickable = Cast<APickable>(HitResult.GetActor());
 
-		AActor* hitActor = hitResult.GetActor();
-
-		//If picking up a gun
-		if (hitActor != nullptr && hitActor->GetRootComponent()->ComponentHasTag(FName("Gun"))) // if the object is a gun
+		if (Pickable && Pickable->GetActive())
 		{
-			APickable* pickable = Cast<APickable>(hitActor); //cast the pickable script
-			if (pickable && pickable->GetActive()) // make sure it's not a null pointer and the item is active
-			{
-				bHasGun = true;
-				pickable->PickedUp(); //pick up the gun
-				SpawnGun(); //Spawn the gun in player's hands
-				//set ammunition
-				MagAmmo = 16;
-				Ammo = 20;
-			}
+			bHasGun = true;
+			Pickable->PickedUp();
+			SpawnGun();
+			MagAmmo = 16;
+			Ammo = 20;
 		}
-
-		//If picking up ammunition
-		else if (hitActor != nullptr && hitActor->ActorHasTag("Ammo")) // if the object is an ammunition
-		{
-			if (Cast<APickable>(hitActor)) // prevent crashing
-			{
-				APickable* pickable = Cast<APickable>(hitActor); //cast the pickable script
-				if (pickable->GetActive())
-				{
-					pickable->PickedUp(); //pick up the gun
-
-					Ammo += 16; //add ammunition
-				}
-			}
-		}
-
-		//If picking up Health kit
-		else if (hitActor != nullptr && hitActor->ActorHasTag("Medkit")) // if the object is a health kit
-		{
-			if (Cast<APickable>(hitActor)) // prevent crashing
-			{
-				APickable* pickable = Cast<APickable>(hitActor); //cast the pickable script
-				if (pickable->GetActive())
-				{
-					pickable->PickedUp(); //pick up the health kit
-
-					MedKitsNumb++; //add medkit
-				}
-			}
-			else { UE_LOG(LogTemp, Warning, TEXT("Failed to cast ammo in Interact() function")); }
-
-		}
-
-		else if (hitActor != nullptr && hitActor->ActorHasTag("Note")) // if the object is a note pad
-		{
-
-			AReadableNote* note = Cast<AReadableNote>(hitActor);
-
-			if (note && !note->IsOpened())
-			{
-
-				note->OpenNote(); // open note
-
-				//set variables for the note
-				note->PlayerPos = GetActorLocation();
-				note->player = Cast<APawn>(this);
-			}
-		}
-
-		else if (hitActor != nullptr && hitActor->ActorHasTag("Button")) // if the object is a button
-		{
-
-			AElevatorButton* button = Cast<AElevatorButton>(hitActor);
-			if (button && !button->bIsPressed)
-			{
-				button->Press();
-
-			}
-		}
-
 	}
+	else if (HitResult.GetActor()->ActorHasTag("Ammo"))
+	{
+		APickable* Pickable = Cast<APickable>(HitResult.GetActor());
 
+		if (Pickable && Pickable->GetActive())
+		{
+			Pickable->PickedUp();
+			Ammo += 16;
+		}
+	}
+	else if (HitResult.GetActor()->ActorHasTag("Medkit"))
+	{
+		APickable* Pickable = Cast<APickable>(HitResult.GetActor());
+
+		if (Pickable && Pickable->GetActive())
+		{
+			Pickable->PickedUp();
+			medKitsNumb++;
+		}
+	}
+	else if (HitResult.GetActor()->ActorHasTag("Note"))
+	{
+		AReadableNote* Note = Cast<AReadableNote>(HitResult.GetActor());
+
+		if (Note && !Note->IsOpened())
+		{
+			Note->OpenNote();
+			Note->PlayerPos = GetActorLocation();
+			Note->player = Cast<APawn>(this);
+		}
+	}
+	else if (HitResult.GetActor()->ActorHasTag("Button"))
+	{
+		AElevatorButton* Button = Cast<AElevatorButton>(HitResult.GetActor());
+
+		if (Button && !Button->bIsPressed)
+		{
+			Button->Press();
+		}
+	}
 }
 
 //override TakeDamage function
-float APlayerCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+float APlayerCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	const float DamageApplied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	DamageApplied = FMath::Min(Health, DamageApplied); //Damage applied can't be higher value than health
+	const float PrevHealth = Health;
+	Health = FMath::Max(0.f, Health - DamageApplied);
 
-	Health -= DamageApplied; //Decrease health
-
-	if (PlayerHurtSound)
-	{
-		UGameplayStatics::PlaySound2D(GetWorld(), PlayerHurtSound);
-	}
-
-
-	if (Health <= 0)
+	if (PrevHealth > 0.f && Health <= 0.f)
 	{
 		AProjectHALFPlayerController* controller = Cast<AProjectHALFPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 		if (controller)
@@ -268,42 +232,27 @@ float APlayerCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const
 		{
 			UGameplayStatics::PlaySound2D(GetWorld(), DeathSound);
 		}
-
-
 	}
+
+	if (PlayerHurtSound)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), PlayerHurtSound);
+	}
+
 	return DamageApplied;
-
-}
-
-
-bool APlayerCharacter::IsReloading() const
-{
-
-	return bIsReloading;
-
 }
 
 void APlayerCharacter::Reload()
 {
-	//if player has a gun and ammunition
-	if (Gun && MagAmmo < 16 && Ammo>0)
+	if (Gun && MagAmmo < 16 && Ammo > 0)
 	{
+		const int32 Amount = FMath::Min(16 - MagAmmo, Ammo);
+		Ammo -= Amount;
+		MagAmmo += Amount;
+		check(Ammo >= 0);
+
 		bIsReloading = true;
-		float amount = 16 - MagAmmo; //calculate the amount of bullets that will be moved to magazine
-
-		for (int i = 0; i < amount; i++)
-		{
-			if (Ammo > 0)
-			{
-				Ammo--;
-				MagAmmo++;
-
-				if (Ammo < 0) { Ammo = 0; }
-			}
-		}
-		//reset reloading boolean
-		GetWorldTimerManager().SetTimer(ReloadingHandle, this, &APlayerCharacter::ResetReload, ReloadTime, false);
-
+		GetWorldTimerManager().SetTimer(ReloadingHandle, this, &APlayerCharacter::ResetReload, reloadTime, false);
 	}
 }
 
@@ -311,12 +260,11 @@ void APlayerCharacter::ResetReload()
 {
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), ReloadingSound, Gun->GetActorLocation());
 	bIsReloading = false;
-
 }
 
 float APlayerCharacter::GetHealthPercent() const
 {
-	return (Health / MaxHealth);
+	return Health / MaxHealth;
 }
 
 float APlayerCharacter::GetMagAmmunition() const
@@ -329,61 +277,67 @@ float APlayerCharacter::GetAmmunition() const
 	return Ammo;
 }
 
-int APlayerCharacter::GetMedKitsNumb() const
+bool APlayerCharacter::IsReloading() const
 {
-	return MedKitsNumb;
+	return bIsReloading;
+}
+
+int32 APlayerCharacter::GetMedKitsNumb() const
+{
+	return medKitsNumb;
 }
 
 FString APlayerCharacter::GetHealthText() const
 {
-	FString HealthPercText = FString::SanitizeFloat(GetHealthPercent() * 100.f);
-	FString text = "Health: " + HealthPercText + "%";
-
-	return text;
+	return FString::Printf(TEXT("Health: %.0f%%"), GetHealthPercent() * 100.f);
 }
+
+void APlayerCharacter::SpawnGun()
+{
+	check(GunBP);
+	Gun = GetWorld()->SpawnActor<AGun>(GunBP);
+
+	Gun->bGunActive = true;
+	Gun->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::KeepRelativeTransform, TEXT("GunSocket"));
+	Gun->SetOwner(this);
+}
+float APlayerCharacter::GetHealth()const
+{
+	return Health;
+}
+
+float APlayerCharacter::GetMaxHealth()const
+{
+	return MaxHealth;
+}
+
+
+void APlayerCharacter::Heal()
+{
+	if (medKitsNumb > 0)
+	{
+		medKitsNumb--;
+		Health = FMath::Min(MaxHealth, Health + 40.f);
+	}
+}
+
+
 
 void APlayerCharacter::SavePlayerData(float& OutHealth, float& OutAmmo, float& OutMagAmmo, int& OutMedKitsNumb, bool& bPlayerHasGun)
 {
 	OutHealth = this->Health;
 	OutAmmo = this->Ammo;
 	OutMagAmmo = this->MagAmmo;
-	OutMedKitsNumb = this->MedKitsNumb;
+	OutMedKitsNumb = this->medKitsNumb;
 	bPlayerHasGun = this->bHasGun;
 }
-
 void APlayerCharacter::LoadPlayerData(float NewHealth, float NewAmmo, float NewMagAmmo, int NewMedKitsNumb, bool bPlayerHasGun)
 {
 	this->Health = NewHealth;
 	this->Ammo = NewAmmo;
 	this->MagAmmo = NewMagAmmo;
 	this->bHasGun = bPlayerHasGun;
-	this->MedKitsNumb = NewMedKitsNumb;
-}
-
-void APlayerCharacter::SpawnGun()
-{
-	//spawn gun
-	Gun = GetWorld()->SpawnActor<AGun>(GunBP);
-
-	Gun->bGunActive = true;
-
-	//Attach to player's hand
-	Gun->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::KeepRelativeTransform, TEXT("GunSocket"));
-	//set the player as a owner of the gun
-	Gun->SetOwner(this);
-
-}
-
-void APlayerCharacter::Heal()
-{
-
-	if (MedKitsNumb > 0)
-	{
-		MedKitsNumb--;
-		Health = FMath::Clamp(Health + 40, 0.f, (float)MaxHealth); //clamp the health so it wouldn't exceed max health
-
-	}
-
+	this->medKitsNumb = NewMedKitsNumb;
 }
 void APlayerCharacter::PauseGame()
 {
