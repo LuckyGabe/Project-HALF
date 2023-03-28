@@ -79,11 +79,9 @@ bool UTriggerComponent::IsOverlappingPlayer()
 
 void UTriggerComponent::EndGame()
 {
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	AProjectHALFPlayerController* ProjectHALFPlayerController = Cast<AProjectHALFPlayerController>(PlayerController);
-
-	if (ProjectHALFPlayerController != nullptr)
+	AProjectHALFPlayerController* controller = Cast<AProjectHALFPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (controller != nullptr)
 	{
-		ProjectHALFPlayerController->bGameWin = true;
+		controller->bGameWin = true;
 	}
 }
